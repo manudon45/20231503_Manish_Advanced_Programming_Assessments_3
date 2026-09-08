@@ -20,7 +20,7 @@ adds intra-account transfers, a dynamic one-to-many account model, and JSON data
 | 1 | Gherkin scenarios for intra-account transfers and staff fee logic | Complete (`Gherkin-Scenarios.docx`) |
 | 2 | `feature/sprint3-integration` branch + `.gitignore` | Complete |
 | 3 | One-to-many account model, dynamic "Add New Account", Bank Staff distinction | Complete |
-| 4 | High-fidelity UI, form consistency, dedicated transfer screen | In progress |
+| 4 | Form inheritance (`BaseForm`), dedicated intra-account transfer screen, wireframes | Complete |
 | 5 | JSON serialization with polymorphic account types, auto save/load | In progress |
 | 6 | Manual test plan and results table | In progress |
 | 7 | Controller XML documentation + generated report | In progress |
@@ -77,6 +77,42 @@ The architectural difference between a regular customer and a staff member is mo
 
 ---
 
+## 2b. Sprint 3 - Task 4: High-Fidelity UI & Form Inheritance
+
+### Visual inheritance - `BaseForm`
+
+`BaseForm : Form` is the single source of visual truth. Every window inherits it:
+`Form1`, `CustomerManagementForm`, `AddAccountForm` and `TransferForm`.
+
+`BaseForm` provides:
+
+- the palette constants (`NavyDark`, `Gold`, `TextGray`, ...) as `protected` members;
+- a constructor that applies `BackColor` / `ForeColor` / `Font` / `AutoScaleMode`;
+- `CreateBrandBar(subtitle)` - the gold "MB" logo + "ManishRayyy Bank" title strip;
+- control factories: `CreatePrimaryButton` / `CreateAccentButton` / `CreateNeutralButton` /
+  `CreateDangerButton`, `CreateFieldLabel`, `CreateStyledTextBox`, `CreateStyledComboBox`.
+
+### Intra-account transfer
+
+- **Controller logic** (`CustomerController.TransferFunds(customerNumber, sourceIndex,
+  destinationIndex, amount)`) lives in the Controller, not the Form. It validates the customer,
+  the account indices, that source and destination differ, and a positive amount, then reuses
+  `Account.Withdraw` / `Account.Deposit` so overdraft limits, balance checks and the
+  staff-discounted failed-transaction fee all apply. A failed withdrawal aborts the transfer
+  before any money reaches the destination (no partial transfers).
+- **`TransferForm`** is the dedicated screen: a customer `ComboBox`, plus **Source** and
+  **Destination** `ComboBox` pickers populated from that customer's `Accounts` (no free-text
+  entry), a live balance caption under each, an amount field, and a green/red result line.
+  Opened from the dashboard's **TRANSFER »** button, primed with the active user.
+
+### Navigation / wireframes
+
+- `Task4-UI-Wireframes-and-Sitemap.md` - sitemap (Mermaid), navigation flow, ASCII wireframes for
+  every screen (with a detailed layout for the new Intra-Account Transfer interface), and the
+  form-inheritance tree.
+
+---
+
 ## 3. Prerequisites & Opening the Solution
 
 ### Prerequisites
@@ -106,6 +142,7 @@ The architectural difference between a regular customer and a staff member is mo
    - Click account tabs to switch between the customer's accounts.
    - Use **DEPOSIT**, **WITHDRAW** and **CALC INTEREST**.
    - Click **+ ADD ACCOUNT** to attach a new account to the active customer.
+   - Click **TRANSFER »** to move funds between the customer's own accounts.
    - Click **MANAGE CUSTOMERS** to add, update or delete customers.
 
 ### Command line
@@ -132,8 +169,9 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 
 ### Current result
 
-- **Total: 19 - Passed: 19 - Failed: 0**
-- Includes `AddAccountToCustomer` happy-path and unknown-type coverage for the Sprint 3 one-to-many feature.
+- **Total: 23 - Passed: 23 - Failed: 0**
+- Includes `AddAccountToCustomer` (one-to-many) and `TransferFunds` coverage: valid transfer,
+  same-account rejection, insufficient-funds rollback, and the staff 50% failed-fee discount.
 
 ---
 
@@ -155,9 +193,11 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 │   │   ├── User.cs                                  # Abstract user base (AddAccount / RemoveAccount)
 │   │   ├── Customer.cs                              # IsStaff => false
 │   │   └── BankStaff.cs                             # IsStaff => true, StaffId
+│   ├── BaseForm.cs                                  # Visual inheritance base (Task 4)
 │   ├── Form1.cs / Form1.Designer.cs                 # Main dashboard (dynamic account tabs)
 │   ├── CustomerManagementForm.cs / .Designer.cs     # Customer management modal
 │   ├── AddAccountForm.cs                            # Add-account modal (Sprint 3)
+│   ├── TransferForm.cs                              # Intra-account transfer modal (Task 4)
 │   └── Program.cs
 │
 ├── 20231503_ManishRay_Assignment3.Tests/           # MSTest project
@@ -169,6 +209,7 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 ├── AdvancedProgrammingUMLDiagrams.drawio           # Updated UML class diagram
 ├── Gherkin-Scenarios.docx                          # Task 1 BDD scenarios
 ├── Task3-Class-Extensions-Report.md                # Task 3 class extensions report
+├── Task4-UI-Wireframes-and-Sitemap.md              # Task 4 wireframes, sitemap, form-inheritance tree
 └── README.md
 ```
 
