@@ -24,5 +24,23 @@ namespace _20231503_ManishRay_Assignment3.Models
             Name = name;
             ContactDetails = contactDetails;
         }
+
+        public void AddAccount(Account account)
+        {
+            if (account != null)
+            {
+                Accounts.Add(account);
+            }
+        }
+
+        public bool RemoveAccount(Account account)
+        {
+            if (account == null || Accounts.Count <= 1)
+            {
+                return false;
+            }
+
+            return Accounts.Remove(account);
+        }
     }
 }

@@ -1,113 +1,181 @@
-# Assessment 2: Customer Information Management Prototype (Sprint 2)
+# Assessment 3: Bank Account Management System (Sprint 3)
 
-**Student Name:** Manish Ray  
-**Student ID:** 20231503  
-**Course:** IT7742 Advanced Programming  
-**Assessment:** Assessment 2 - Sprint 2 (30% Weighting)  
-
----
-
-## 1. Banking System Overview & Sprint 2 Features
-
-This repository contains the **Sprint 2** prototype for the Banking System Case Study. Sprint 2 extends the financial foundation built in Sprint 1 by implementing structural architectural patterns, custom exception handling, and automated unit testing.
-
-### Key Features Added in Sprint 2:
-- **Model-View-Controller (MVC) Architecture**: Decouples customer management from the user interface. A dedicated `CustomerController` handles customer state, customer creation, detail updates, deletion, and customer seeding (`C-2026-001` and `C-2026-002`).
-- **Separate Customer Management GUI View**: Customer management is hosted in a dedicated form (`CustomerManagementForm`), accessible via the **"MANAGE CUSTOMERS"** button on the main dashboard. Supports Visual Studio WinForms Drag-and-Drop Designer editing.
-- **Custom Exception Handling**: Custom exception hierarchy (`BankingException` base and `InsufficientFundsException` subclass) enforcing tailored error messages per account type (Everyday, Investment fee deductions, and Omni overdraft limits).
-- **Hardened Model Encapsulation**: Balance mutations are locked behind a `private` field with a `protected AdjustBalance` mutator in `Account.cs`. Account list composition is explicitly managed by concrete subclasses (`Customer` and `BankStaff`).
-- **Automated MSTest Unit Test Suite**: Comprehensive unit testing covering happy paths, failure exception paths, fee discounts for bank staff, interest calculations, and controller CRUD operations.
+**Student Name:** Manish Ray
+**Student ID:** 20231503
+**Course:** IT7742 Advanced Programming
+**Assessment:** Assessment 3 - Sprint 3 (Final Delivery)
 
 ---
 
-## 2. Prerequisites & Opening the Solution in Visual Studio
+## 1. Banking System Overview & Sprint 3 Scope
 
-### Prerequisites / Dependencies Required:
-- **Visual Studio 2022** (version 17.0 or later) with the **.NET Desktop Development** workload installed.
-- **.NET 10.0 SDK** (or .NET 8.0/9.0 SDK matching installed .NET environment).
-- No external third-party NuGet packages are required (uses standard built-in .NET SDK and MSTest framework).
+This repository contains the **Sprint 3** delivery of the Banking System Case Study. Sprint 3
+integrates the Sprint 1 domain logic and the Sprint 2 MVC structure into the final application and
+adds intra-account transfers, a dynamic one-to-many account model, and JSON data persistence.
 
-### Step-by-Step Instructions to Open the Solution:
-1. Launch **Visual Studio 2022**.
-2. Click **Open a project or solution**.
-3. Navigate to the repository directory:  
-   `Assignment2\Assignment2\`
-4. Select and open **`20231503_ManishRay_Assignment2.sln`** (or `20231503_ManishRay_Assignment2.slnx`).
-5. Wait for Visual Studio to load the solution projects:
-   - `20231503_ManishRay_Assignment2` (Main WinForms GUI Application)
-   - `20231503_ManishRay_Assignment2.Tests` (MSTest Unit Test Project)
+### Feature status
+
+| Task | Feature | Status |
+|------|---------|--------|
+| 1 | Gherkin scenarios for intra-account transfers and staff fee logic | Complete (`Gherkin-Scenarios.docx`) |
+| 2 | `feature/sprint3-integration` branch + `.gitignore` | Complete |
+| 3 | One-to-many account model, dynamic "Add New Account", Bank Staff distinction | Complete |
+| 4 | High-fidelity UI, form consistency, dedicated transfer screen | In progress |
+| 5 | JSON serialization with polymorphic account types, auto save/load | In progress |
+| 6 | Manual test plan and results table | In progress |
+| 7 | Controller XML documentation + generated report | In progress |
+| 8 | 3-page bank staff user guide | In progress |
 
 ---
 
-## 3. Explicit Instructions to Run the GUI Application
+## 2. Sprint 3 - Task 3: Architectural Evolution (One-to-Many)
 
-### Running via Visual Studio:
-1. Set `20231503_ManishRay_Assignment2` as the **Startup Project** (right-click the project in **Solution Explorer** $\rightarrow$ select **Set as Startup Project**).
-2. Press **`F5`** (or click the green **Play / Start** button in the top toolbar marked `20231503_ManishRay_Assignment2`).
-3. The main Banking Dashboard window (`Form1`) will launch:
-   - Select an **Active User** from the top right dropdown.
-   - Switch between **Everyday Account**, **Investment Account**, and **Omni Account** tabs.
-   - Enter an amount to test **Deposit**, **Withdraw**, or **Calculate Interest**.
-   - Click **"MANAGE CUSTOMERS"** in the top navigation bar to launch the modal form (`CustomerManagementForm`) for adding, updating, or deleting customer records.
+Sprint 1 and Sprint 2 gave every customer exactly three accounts created in the constructor. Sprint 3
+turns the `List<Account>` into a true one-to-many relationship that can grow at runtime through the
+Controller.
 
-### Running via Command Line (Terminal / PowerShell):
-From the repository root folder, run:
+### Model changes
+
+- **`User`** (abstract base)
+  - `AddAccount(Account account)` - attaches a new account to the `Accounts` collection.
+  - `RemoveAccount(Account account)` - detaches an account, always keeping a minimum of one.
+- **`Customer` / `BankStaff`** - unchanged construction, but the account list is no longer fixed in size.
+
+### Bank Staff distinction
+
+The architectural difference between a regular customer and a staff member is modelled with
+**inheritance plus a polymorphic flag**:
+
+- `User.IsStaff` is an `abstract bool` property.
+- `Customer` overrides it to return `false`; `BankStaff` overrides it to return `true` and adds a
+  `StaffId` attribute.
+- `Account.Deposit` / `Account.Withdraw` accept an `isStaff` argument; when `true` the failed
+  transaction fee on Investment and Omni accounts is halved (the 50% Bank Staff Benefit).
+
+### Controller changes (`CustomerController`)
+
+| Method | Purpose |
+|--------|---------|
+| `AddAccountToCustomer(customerNumber, accountType, initialBalance, extraParameter)` | Creates an `EverydayAccount`, `InvestmentAccount` or `OmniAccount` and adds it to the customer. `extraParameter` is the interest rate (Investment) or overdraft limit (Omni). Returns `bool`. |
+| `RemoveAccountFromCustomer(customerNumber, accountIndex)` | Removes one account, keeping a minimum of one. |
+| `GetAccountsForCustomer(customerNumber)` | Returns the customer's `List<Account>`. |
+
+### UI changes
+
+- The main dashboard account tabs are now generated dynamically from `currentUser.Accounts`
+  inside a horizontally scrolling `FlowLayoutPanel`, so any number of accounts is supported.
+- A new **"+ ADD ACCOUNT"** button opens `AddAccountForm`, a modal dialog that uses `ComboBox`
+  selection for the account type and adds the account through the Controller (not the Form).
+- Switching the active user rebuilds the tab strip.
+
+### Supporting documents
+
+- `Task3-Class-Extensions-Report.md` - full attribute and method-signature report for the
+  `Customer`, `Account` and `Controller` classes.
+- `AdvancedProgrammingUMLDiagrams.drawio` - updated class diagram showing the `1 --- 0..*`
+  Customer/Account association and the Bank Staff distinction.
+
+---
+
+## 3. Prerequisites & Opening the Solution
+
+### Prerequisites
+
+- **Visual Studio 2022** (17.8 or later) with the **.NET Desktop Development** workload.
+- **.NET 10.0 SDK** (`net10.0-windows` target framework).
+- No third-party NuGet packages (built-in .NET SDK + MSTest).
+
+### Open the solution
+
+1. Launch Visual Studio 2022 and choose **Open a project or solution**.
+2. Open **`20231503_ManishRay_Assignment3.slnx`** in the repository root.
+3. Projects loaded:
+   - `20231503_ManishRay_Assignment3` - WinForms GUI application.
+   - `20231503_ManishRay_Assignment3.Tests` - MSTest unit tests.
+
+---
+
+## 4. Running the Application
+
+### Visual Studio
+
+1. Set `20231503_ManishRay_Assignment3` as the **Startup Project**.
+2. Press **F5**.
+3. On the dashboard:
+   - Select an **Active User** from the top-right dropdown.
+   - Click account tabs to switch between the customer's accounts.
+   - Use **DEPOSIT**, **WITHDRAW** and **CALC INTEREST**.
+   - Click **+ ADD ACCOUNT** to attach a new account to the active customer.
+   - Click **MANAGE CUSTOMERS** to add, update or delete customers.
+
+### Command line
+
 ```bash
-dotnet run --project "20231503_ManishRay_Assignment2/20231503_ManishRay_Assignment2.csproj"
+dotnet run --project "20231503_ManishRay_Assignment3/20231503_ManishRay_Assignment3.csproj"
 ```
 
 ---
 
-## 4. Locating, Building, and Executing the Unit Test Suite
+## 5. Unit Tests
 
-### Executing via Visual Studio Test Explorer:
-1. In Visual Studio, open the top menu bar and select **Test** $\rightarrow$ **Test Explorer** (or press `Ctrl + E, T`).
-2. The **Test Explorer** panel will open on the side.
-3. Click the **Build** menu $\rightarrow$ select **Build Solution** (or press `Ctrl + Shift + B`) to ensure test binaries are built.
-4. In **Test Explorer**, click the **Run All Tests in View** button (or press `Ctrl + R, A`).
-5. All 17 test cases under `20231503_ManishRay_Assignment2.Tests` will execute, displaying green checkmarks for passed tests.
+### Visual Studio
 
-### Executing via Command Line:
-From the repository root folder, run:
+1. **Test > Test Explorer**.
+2. **Build > Build Solution**.
+3. **Run All Tests**.
+
+### Command line
+
 ```bash
-dotnet test "20231503_ManishRay_Assignment2.Tests/20231503_ManishRay_Assignment2.Tests.csproj"
+dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3.Tests.csproj"
 ```
 
-### Test Suite Execution Summary:
-- **Total Tests**: 17
-- **Passed**: 17
-- **Failed**: 0
+### Current result
+
+- **Total: 19 - Passed: 19 - Failed: 0**
+- Includes `AddAccountToCustomer` happy-path and unknown-type coverage for the Sprint 3 one-to-many feature.
 
 ---
 
-## Project File Structure
+## 6. Project Structure
 
 ```text
-Assignment2/
-├── 20231503_ManishRay_Assignment2/             # Main WinForms GUI Project
+20231503_Manish_Advanced_Programming_Assessments_3/
+├── 20231503_ManishRay_Assignment3/                  # WinForms GUI project
 │   ├── Controllers/
-│   │   └── CustomerController.cs                # MVC Controller
+│   │   └── CustomerController.cs                    # MVC Controller (customer + account CRUD)
 │   ├── Exceptions/
-│   │   ├── BankingException.cs                  # Base Custom Exception
-│   │   └── InsufficientFundsException.cs        # Insufficient Funds Exception
+│   │   ├── BankingException.cs
+│   │   └── InsufficientFundsException.cs
 │   ├── Models/
-│   │   ├── Account.cs                           # Abstract Account Base
-│   │   ├── EverydayAccount.cs                   # Everyday Account
-│   │   ├── InvestmentAccount.cs                 # Investment Account
-│   │   ├── OmniAccount.cs                       # Omni Account
-│   │   ├── User.cs                              # Abstract User Base
-│   │   ├── Customer.cs                          # Customer Model
-│   │   └── BankStaff.cs                         # Bank Staff Model
-│   ├── Form1.cs & Form1.Designer.cs             # Main Dashboard View
-│   ├── CustomerManagementForm.cs & Designer.cs  # Customer Management Modal View
-│   └── Program.cs                               # Entry Point
+│   │   ├── Account.cs                               # Abstract account base
+│   │   ├── EverydayAccount.cs
+│   │   ├── InvestmentAccount.cs
+│   │   ├── OmniAccount.cs
+│   │   ├── User.cs                                  # Abstract user base (AddAccount / RemoveAccount)
+│   │   ├── Customer.cs                              # IsStaff => false
+│   │   └── BankStaff.cs                             # IsStaff => true, StaffId
+│   ├── Form1.cs / Form1.Designer.cs                 # Main dashboard (dynamic account tabs)
+│   ├── CustomerManagementForm.cs / .Designer.cs     # Customer management modal
+│   ├── AddAccountForm.cs                            # Add-account modal (Sprint 3)
+│   └── Program.cs
 │
-├── 20231503_ManishRay_Assignment2.Tests/       # Unit Test Project
-│   ├── EverydayAccountTests.cs                  # Everyday Account Tests
-│   ├── InvestmentAccountTests.cs                # Investment Account Tests
-│   ├── OmniAccountTests.cs                      # Omni Account Tests
-│   └── CustomerControllerTests.cs               # Controller CRUD Tests
+├── 20231503_ManishRay_Assignment3.Tests/           # MSTest project
+│   ├── EverydayAccountTests.cs
+│   ├── InvestmentAccountTests.cs
+│   ├── OmniAccountTests.cs
+│   └── CustomerControllerTests.cs
 │
-├── AdvancedProgrammingUMLDiagrams.drawio        # Draw.io UML Class Diagram
-└── README.md                                    # Comprehensive Documentation
+├── AdvancedProgrammingUMLDiagrams.drawio           # Updated UML class diagram
+├── Gherkin-Scenarios.docx                          # Task 1 BDD scenarios
+├── Task3-Class-Extensions-Report.md                # Task 3 class extensions report
+└── README.md
 ```
+
+---
+
+## 7. Version Control
+
+- Development branch: **`feature/sprint3-integration`** (no work on `main`).
+- `.gitignore` excludes `bin/`, `obj/`, `.vs/` and other IDE/build artefacts.
+- The feature branch is merged into `main` once Task 5 is functional to mark the project release.

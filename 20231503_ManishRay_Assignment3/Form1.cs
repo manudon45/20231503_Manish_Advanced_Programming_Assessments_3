@@ -25,13 +25,11 @@ namespace _20231503_ManishRay_Assignment3
         // Controls we need to read or update at runtime
         private ComboBox cmbUser = null!;
         private Label lblUserInfo = null!;
-        private Button btnEveryday = null!;
-        private Button btnInvestment = null!;
-        private Button btnOmni = null!;
+        private FlowLayoutPanel flowTabs = null!;
+        private readonly List<Button> navButtons = new();
+        private readonly List<Panel> navIndicators = new();
         private Button btnManageCustomers = null!;
-        private Panel navIndEveryday = null!;
-        private Panel navIndInvestment = null!;
-        private Panel navIndOmni = null!;
+        private Button btnAddAccount = null!;
         private Label lblAccTitle = null!;
         private Label lblBalance = null!;
         private Label lblAccDetails = null!;
@@ -85,7 +83,7 @@ namespace _20231503_ManishRay_Assignment3
             layout.Margin = Padding.Empty;
             layout.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 120f));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 132f));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 140f));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 90f));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
@@ -156,10 +154,19 @@ namespace _20231503_ManishRay_Assignment3
             cmbUser.Font = new Font("Segoe UI", 9.5f);
             cmbUser.SelectedIndexChanged += cmbUser_SelectedIndexChanged;
 
+            lblUserInfo = new Label();
+            lblUserInfo.AutoSize = false;
+            lblUserInfo.Size = new Size(350, 18);
+            lblUserInfo.Location = new Point(590, 58);
+            lblUserInfo.ForeColor = TextGray;
+            lblUserInfo.BackColor = Color.Transparent;
+            lblUserInfo.Font = new Font("Segoe UI", 8f);
+            lblUserInfo.TextAlign = ContentAlignment.MiddleRight;
+
             // Dark strip at the bottom of the header that holds the nav tabs
             var pnlNav = new Panel();
             pnlNav.Dock = DockStyle.Bottom;
-            pnlNav.Height = 44;
+            pnlNav.Height = 56;
             pnlNav.BackColor = NavStrip;
 
             // Thin gold line along the very bottom of the nav strip
@@ -167,42 +174,36 @@ namespace _20231503_ManishRay_Assignment3
             navBorder.Dock = DockStyle.Bottom;
             navBorder.Height = 2;
             navBorder.BackColor = Gold;
-            pnlNav.Controls.Add(navBorder);
 
-            // Create each nav tab explicitly
-            var navItem0Data = CreateNavItem("Everyday Account", new Point(16, 0));
-            btnEveryday = navItem0Data.button;
-            navIndEveryday = navItem0Data.indicator;
+            // Horizontally scrolling container for the dynamic account tabs
+            flowTabs = new FlowLayoutPanel();
+            flowTabs.Dock = DockStyle.Fill;
+            flowTabs.BackColor = NavStrip;
+            flowTabs.WrapContents = false;
+            flowTabs.AutoScroll = true;
+            flowTabs.Padding = new Padding(8, 4, 8, 0);
 
-            var navItem1Data = CreateNavItem("Investment Account", new Point(221, 0));
-            btnInvestment = navItem1Data.button;
-            navIndInvestment = navItem1Data.indicator;
+            var pnlNavRight = new Panel();
+            pnlNavRight.Dock = DockStyle.Right;
+            pnlNavRight.Width = 330;
+            pnlNavRight.BackColor = NavStrip;
 
-            var navItem2Data = CreateNavItem("Omni Account", new Point(426, 0));
-            btnOmni = navItem2Data.button;
-            navIndOmni = navItem2Data.indicator;
-
-            btnEveryday.Click += (s, e) =>
-            {
-                SelectAccount(0);
-            };
-            btnInvestment.Click += (s, e) =>
-            {
-                SelectAccount(1);
-            };
-            btnOmni.Click += (s, e) =>
-            {
-                SelectAccount(2);
-            };
-
-            pnlNav.Controls.Add(navItem0Data.container);
-            pnlNav.Controls.Add(navItem1Data.container);
-            pnlNav.Controls.Add(navItem2Data.container);
+            btnAddAccount = new Button();
+            btnAddAccount.Text = "+ ADD ACCOUNT";
+            btnAddAccount.Location = new Point(8, 11);
+            btnAddAccount.Size = new Size(150, 32);
+            btnAddAccount.FlatStyle = FlatStyle.Flat;
+            btnAddAccount.BackColor = SuccessGreen;
+            btnAddAccount.ForeColor = NavyDark;
+            btnAddAccount.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            btnAddAccount.Cursor = Cursors.Hand;
+            btnAddAccount.FlatAppearance.BorderSize = 0;
+            btnAddAccount.Click += btnAddAccount_Click;
 
             btnManageCustomers = new Button();
             btnManageCustomers.Text = "MANAGE CUSTOMERS";
-            btnManageCustomers.Location = new Point(626, 6);
-            btnManageCustomers.Size = new Size(160, 32);
+            btnManageCustomers.Location = new Point(164, 11);
+            btnManageCustomers.Size = new Size(158, 32);
             btnManageCustomers.FlatStyle = FlatStyle.Flat;
             btnManageCustomers.BackColor = Gold;
             btnManageCustomers.ForeColor = NavyDark;
@@ -211,26 +212,58 @@ namespace _20231503_ManishRay_Assignment3
             btnManageCustomers.FlatAppearance.BorderSize = 0;
             btnManageCustomers.Click += btnManageCustomers_Click;
 
-            pnlNav.Controls.Add(btnManageCustomers);
+            pnlNavRight.Controls.Add(btnAddAccount);
+            pnlNavRight.Controls.Add(btnManageCustomers);
 
-            // User info text on the right of the nav strip
-            lblUserInfo = new Label();
-            lblUserInfo.AutoSize = false;
-            lblUserInfo.Size = new Size(180, 42);
-            lblUserInfo.Location = new Point(790, 0);
-            lblUserInfo.ForeColor = TextGray;
-            lblUserInfo.BackColor = Color.Transparent;
-            lblUserInfo.Font = new Font("Segoe UI", 8f);
-            lblUserInfo.TextAlign = ContentAlignment.MiddleRight;
-            pnlNav.Controls.Add(lblUserInfo);
+            pnlNav.Controls.Add(flowTabs);
+            pnlNav.Controls.Add(pnlNavRight);
+            pnlNav.Controls.Add(navBorder);
 
             panel.Controls.Add(logo);
             panel.Controls.Add(lblName);
             panel.Controls.Add(lblTag);
             panel.Controls.Add(lblUserHead);
             panel.Controls.Add(cmbUser);
+            panel.Controls.Add(lblUserInfo);
             panel.Controls.Add(pnlNav);
             return panel;
+        }
+
+        private void btnAddAccount_Click(object? sender, EventArgs e)
+        {
+            if (currentUser == null)
+            {
+                return;
+            }
+
+            using var dialog = new AddAccountForm(customerController, currentUser);
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                RebuildAccountTabs();
+                SelectAccount(currentUser.Accounts.Count - 1);
+                LogTransaction("New account added to profile.");
+            }
+        }
+
+        private void RebuildAccountTabs()
+        {
+            flowTabs.SuspendLayout();
+            flowTabs.Controls.Clear();
+            navButtons.Clear();
+            navIndicators.Clear();
+
+            var accounts = currentUser.Accounts;
+            for (int i = 0; i < accounts.Count; i++)
+            {
+                int index = i;
+                var item = CreateNavItem(accounts[i].AccountName);
+                item.button.Click += (s, e) => SelectAccount(index);
+                navButtons.Add(item.button);
+                navIndicators.Add(item.indicator);
+                flowTabs.Controls.Add(item.container);
+            }
+
+            flowTabs.ResumeLayout();
         }
 
         private void btnManageCustomers_Click(object? sender, EventArgs e)
@@ -242,11 +275,11 @@ namespace _20231503_ManishRay_Assignment3
 
         // Creates a single nav tab: a button with a gold underline indicator below it.
         // Returns a tuple containing the container, button, and indicator.
-        private (Panel container, Button button, Panel indicator) CreateNavItem(string label, Point location)
+        private (Panel container, Button button, Panel indicator) CreateNavItem(string label)
         {
             var container = new Panel();
-            container.Size = new Size(195, 44);
-            container.Location = location;
+            container.Size = new Size(178, 32);
+            container.Margin = new Padding(3, 0, 3, 0);
             container.BackColor = NavStrip;
 
             // Gold underline - only visible when this tab is the active one
@@ -558,6 +591,7 @@ namespace _20231503_ManishRay_Assignment3
                 lblUserInfo.ForeColor = TextGray;
             }
 
+            RebuildAccountTabs();
             SelectAccount(0);
         }
 
@@ -576,17 +610,24 @@ namespace _20231503_ManishRay_Assignment3
                 }
             }
 
+            if (currentUser.Accounts.Count == 0)
+            {
+                return;
+            }
+
+            if (index < 0 || index >= currentUser.Accounts.Count)
+            {
+                index = 0;
+            }
+
             currentAccount = currentUser.Accounts[index];
 
-            Panel[] indicators = { navIndEveryday, navIndInvestment, navIndOmni };
-            Button[] buttons = { btnEveryday, btnInvestment, btnOmni };
-
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < navButtons.Count; i++)
             {
                 bool isActive = (i == index);
-                indicators[i].Visible = isActive;
-                buttons[i].ForeColor = isActive ? Color.White : TextGray;
-                buttons[i].Font = new Font("Segoe UI", 9.5f, isActive ? FontStyle.Bold : FontStyle.Regular);
+                navIndicators[i].Visible = isActive;
+                navButtons[i].ForeColor = isActive ? Color.White : TextGray;
+                navButtons[i].Font = new Font("Segoe UI", 9.5f, isActive ? FontStyle.Bold : FontStyle.Regular);
             }
 
             btnCalcInterest.Visible = (currentAccount is InvestmentAccount) || (currentAccount is OmniAccount);

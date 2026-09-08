@@ -73,6 +73,56 @@ namespace _20231503_ManishRay_Assignment3.Controllers
             return true;
         }
 
+        // Add a new account to an existing customer at runtime (One-to-Many expansion)
+        public bool AddAccountToCustomer(string customerNumber, string accountType, decimal initialBalance, decimal extraParameter)
+        {
+            User? cust = GetCustomerByNumber(customerNumber);
+            if (cust == null || string.IsNullOrWhiteSpace(accountType))
+            {
+                return false;
+            }
+
+            Account newAccount;
+            switch (accountType.Trim().ToLowerInvariant())
+            {
+                case "everyday":
+                    newAccount = new EverydayAccount(initialBalance);
+                    break;
+                case "investment":
+                    decimal rate = extraParameter > 0 ? extraParameter : 0.05m;
+                    newAccount = new InvestmentAccount(rate, initialBalance);
+                    break;
+                case "omni":
+                    decimal overdraft = extraParameter > 0 ? extraParameter : 500m;
+                    newAccount = new OmniAccount(overdraft, initialBalance);
+                    break;
+                default:
+                    return false;
+            }
+
+            cust.AddAccount(newAccount);
+            return true;
+        }
+
+        // Remove one account from a customer (keeps a minimum of one account)
+        public bool RemoveAccountFromCustomer(string customerNumber, int accountIndex)
+        {
+            User? cust = GetCustomerByNumber(customerNumber);
+            if (cust == null || accountIndex < 0 || accountIndex >= cust.Accounts.Count)
+            {
+                return false;
+            }
+
+            return cust.RemoveAccount(cust.Accounts[accountIndex]);
+        }
+
+        // Return the account list for a given customer, or an empty list if not found
+        public List<Account> GetAccountsForCustomer(string customerNumber)
+        {
+            User? cust = GetCustomerByNumber(customerNumber);
+            return cust?.Accounts ?? new List<Account>();
+        }
+
         // Update existing customer details
         public bool UpdateCustomer(string customerNumber, string newName, string newContactDetails)
         {
