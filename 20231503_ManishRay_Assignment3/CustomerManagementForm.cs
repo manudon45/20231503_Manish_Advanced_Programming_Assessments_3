@@ -3,7 +3,7 @@ using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3
 {
-    public partial class CustomerManagementForm : Form
+    public partial class CustomerManagementForm : BaseForm
     {
         private readonly CustomerController controller;
 

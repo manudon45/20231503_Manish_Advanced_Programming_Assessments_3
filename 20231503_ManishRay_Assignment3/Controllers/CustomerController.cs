@@ -1,3 +1,4 @@
+using _20231503_ManishRay_Assignment3.Exceptions;
 using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3.Controllers
@@ -121,6 +122,42 @@ namespace _20231503_ManishRay_Assignment3.Controllers
         {
             User? cust = GetCustomerByNumber(customerNumber);
             return cust?.Accounts ?? new List<Account>();
+        }
+
+        // Intra-account transfer between two accounts belonging to the same customer
+        public string TransferFunds(string customerNumber, int sourceIndex, int destinationIndex, decimal amount)
+        {
+            User? customer = GetCustomerByNumber(customerNumber);
+            if (customer == null)
+            {
+                throw new BankingException("Transfer failed: customer not found.", "Transfer");
+            }
+
+            if (sourceIndex < 0 || sourceIndex >= customer.Accounts.Count ||
+                destinationIndex < 0 || destinationIndex >= customer.Accounts.Count)
+            {
+                throw new BankingException("Transfer failed: invalid account selection.", "Transfer");
+            }
+
+            if (sourceIndex == destinationIndex)
+            {
+                throw new BankingException("Transfer failed: source and destination must be different accounts.", "Transfer");
+            }
+
+            if (amount <= 0)
+            {
+                throw new BankingException("Transfer failed: amount must be a positive value.", "Transfer");
+            }
+
+            Account source = customer.Accounts[sourceIndex];
+            Account destination = customer.Accounts[destinationIndex];
+            bool isStaff = customer.IsStaff;
+
+            source.Withdraw(amount, isStaff);
+            destination.Deposit(amount, isStaff);
+
+            return $"Transfer Successful: {amount:C2} moved from {source.AccountName} to {destination.AccountName}."
+                 + $"  |  {source.AccountName}: {source.Balance:C2}  |  {destination.AccountName}: {destination.Balance:C2}";
         }
 
         // Update existing customer details

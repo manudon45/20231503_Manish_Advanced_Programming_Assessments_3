@@ -4,19 +4,8 @@ using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3
 {
-    public partial class Form1 : Form
+    public partial class Form1 : BaseForm
     {
-        // Colour palette
-        private static readonly Color NavyDark = Color.FromArgb(15, 27, 53);
-        private static readonly Color NavyMid = Color.FromArgb(27, 42, 74);
-        private static readonly Color NavyLight = Color.FromArgb(40, 60, 100);
-        private static readonly Color NavStrip = Color.FromArgb(10, 20, 42);
-        private static readonly Color Gold = Color.FromArgb(201, 168, 76);
-        private static readonly Color TextGray = Color.FromArgb(160, 180, 210);
-        private static readonly Color SuccessGreen = Color.FromArgb(46, 204, 113);
-        private static readonly Color ErrorRed = Color.FromArgb(231, 76, 60);
-        private static readonly Color CardBg = Color.FromArgb(22, 38, 68);
-
         // Data: customer controller instance
         private readonly CustomerController customerController;
         private User currentUser = null!;
@@ -37,6 +26,7 @@ namespace _20231503_ManishRay_Assignment3
         private Button btnDeposit = null!;
         private Button btnWithdraw = null!;
         private Button btnCalcInterest = null!;
+        private Button btnTransfer = null!;
         private ListBox lstHistory = null!;
 
         public Form1()
@@ -245,6 +235,23 @@ namespace _20231503_ManishRay_Assignment3
             }
         }
 
+        private void btnTransfer_Click(object? sender, EventArgs e)
+        {
+            if (currentUser == null)
+            {
+                return;
+            }
+
+            using var dialog = new TransferForm(customerController, currentUser);
+            dialog.ShowDialog();
+
+            if (dialog.TransferPerformed)
+            {
+                RefreshAccountDisplay();
+                LogTransaction("Intra-account transfer screen used - balances refreshed.");
+            }
+        }
+
         private void RebuildAccountTabs()
         {
             flowTabs.SuspendLayout();
@@ -402,6 +409,10 @@ namespace _20231503_ManishRay_Assignment3
             btnCalcInterest.Visible = false;
             btnCalcInterest.Click += btnCalcInterest_Click;
 
+            btnTransfer = CreateActionButton("TRANSFER »", new Point(681, 27), Gold, NavyDark);
+            btnTransfer.Size = new Size(150, 36);
+            btnTransfer.Click += btnTransfer_Click;
+
             var lblNote = new Label();
             lblNote.Text = "***Bank Staff users receive a 50% discount on any transaction fees";
             lblNote.AutoSize = false;
@@ -416,6 +427,7 @@ namespace _20231503_ManishRay_Assignment3
             panel.Controls.Add(btnDeposit);
             panel.Controls.Add(btnWithdraw);
             panel.Controls.Add(btnCalcInterest);
+            panel.Controls.Add(btnTransfer);
             panel.Controls.Add(lblNote);
             return panel;
         }

@@ -3,14 +3,8 @@ using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3
 {
-    public class AddAccountForm : Form
+    public class AddAccountForm : BaseForm
     {
-        private static readonly Color NavyDark = Color.FromArgb(15, 27, 53);
-        private static readonly Color NavyLight = Color.FromArgb(40, 60, 100);
-        private static readonly Color Gold = Color.FromArgb(201, 168, 76);
-        private static readonly Color TextGray = Color.FromArgb(160, 180, 210);
-        private static readonly Color SuccessGreen = Color.FromArgb(46, 204, 113);
-
         private readonly CustomerController controller;
         private readonly User targetUser;
 
@@ -29,70 +23,52 @@ namespace _20231503_ManishRay_Assignment3
         private void BuildUI()
         {
             Text = "Add New Account";
-            ClientSize = new Size(430, 300);
+            ClientSize = new Size(440, 372);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            BackColor = NavyDark;
-            ForeColor = Color.White;
-            Font = new Font("Segoe UI", 9f);
+
+            Controls.Add(CreateBrandBar("Add a new account to a customer profile"));
 
             var lblHead = new Label
             {
-                Text = $"NEW ACCOUNT FOR {targetUser.Name.ToUpperInvariant()} (#{targetUser.CustomerNumber})",
+                Text = $"NEW ACCOUNT FOR {targetUser.Name.ToUpperInvariant()}  (#{targetUser.CustomerNumber})",
                 ForeColor = Gold,
                 Font = new Font("Segoe UI", 9f, FontStyle.Bold),
-                Location = new Point(20, 18),
-                Size = new Size(390, 22)
+                Location = new Point(20, 80),
+                Size = new Size(400, 22)
             };
 
-            var lblType = MakeLabel("Account Type:", new Point(20, 58));
-            cmbType = new ComboBox
-            {
-                Location = new Point(160, 55),
-                Size = new Size(240, 24),
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = NavyLight,
-                ForeColor = Color.White
-            };
+            var lblType = CreateFieldLabel("Account Type:");
+            lblType.Location = new Point(20, 120);
+            cmbType = CreateStyledComboBox();
+            cmbType.Location = new Point(170, 117);
+            cmbType.Size = new Size(240, 24);
             cmbType.Items.AddRange(new object[] { "Everyday Account", "Investment Account", "Omni Account" });
             cmbType.SelectedIndex = 0;
             cmbType.SelectedIndexChanged += (s, e) => UpdateExtraField();
 
-            var lblInit = MakeLabel("Initial Balance ($):", new Point(20, 100));
-            txtInitial = MakeTextBox(new Point(160, 97), "0.00");
+            var lblInit = CreateFieldLabel("Initial Balance ($):");
+            lblInit.Location = new Point(20, 160);
+            txtInitial = CreateStyledTextBox();
+            txtInitial.Location = new Point(170, 157);
+            txtInitial.Size = new Size(240, 24);
+            txtInitial.PlaceholderText = "0.00";
 
-            lblExtra = MakeLabel("Interest Rate:", new Point(20, 142));
-            txtExtra = MakeTextBox(new Point(160, 139), "");
+            lblExtra = CreateFieldLabel("Interest Rate:");
+            lblExtra.Location = new Point(20, 200);
+            txtExtra = CreateStyledTextBox();
+            txtExtra.Location = new Point(170, 197);
+            txtExtra.Size = new Size(240, 24);
 
-            var btnCreate = new Button
-            {
-                Text = "CREATE ACCOUNT",
-                Location = new Point(160, 198),
-                Size = new Size(160, 36),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = SuccessGreen,
-                ForeColor = NavyDark,
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btnCreate.FlatAppearance.BorderSize = 0;
+            var btnCreate = CreatePrimaryButton("CREATE ACCOUNT");
+            btnCreate.Location = new Point(170, 254);
+            btnCreate.Size = new Size(160, 36);
             btnCreate.Click += btnCreate_Click;
 
-            var btnCancel = new Button
-            {
-                Text = "CANCEL",
-                Location = new Point(330, 198),
-                Size = new Size(80, 36),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = NavyLight,
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btnCancel.FlatAppearance.BorderSize = 0;
+            var btnCancel = CreateNeutralButton("CANCEL");
+            btnCancel.Location = new Point(338, 254);
+            btnCancel.Size = new Size(72, 36);
             btnCancel.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
 
             var lblHint = new Label
@@ -102,8 +78,8 @@ namespace _20231503_ManishRay_Assignment3
                      + "Omni: enter an overdraft limit (e.g. 500.00).",
                 ForeColor = TextGray,
                 Font = new Font("Segoe UI", 7.5f),
-                Location = new Point(20, 244),
-                Size = new Size(390, 48)
+                Location = new Point(20, 304),
+                Size = new Size(400, 52)
             };
 
             Controls.AddRange(new Control[]
@@ -177,24 +153,5 @@ namespace _20231503_ManishRay_Assignment3
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private static Label MakeLabel(string text, Point loc) => new Label
-        {
-            Text = text,
-            ForeColor = TextGray,
-            Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-            Location = loc,
-            Size = new Size(135, 20)
-        };
-
-        private static TextBox MakeTextBox(Point loc, string placeholder) => new TextBox
-        {
-            Location = loc,
-            Size = new Size(240, 24),
-            BackColor = NavyLight,
-            ForeColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle,
-            PlaceholderText = placeholder
-        };
     }
 }
