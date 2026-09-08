@@ -4,127 +4,22 @@ using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3
 {
-    public class TransferForm : BaseForm
+    // Modal dialog for an intra-account transfer: pick a customer, then a Source and a Destination
+    // account from that customer's own profile. The layout lives in TransferForm.Designer.cs.
+    public partial class TransferForm : BaseForm
     {
-        private readonly CustomerController controller;
+        private readonly CustomerController customersController;
+        private readonly TransferController transfersController;
         private User customer = null!;
-
-        private ComboBox cmbCustomer = null!;
-        private ComboBox cmbSource = null!;
-        private ComboBox cmbDestination = null!;
-        private TextBox txtAmount = null!;
-        private Label lblSourceBal = null!;
-        private Label lblDestBal = null!;
-        private Label lblStaff = null!;
-        private Label lblResult = null!;
-        private Button btnExecute = null!;
 
         public bool TransferPerformed { get; private set; }
 
-        public TransferForm(CustomerController customerController, User? initialCustomer = null)
+        public TransferForm(BankController bank, User? initialCustomer = null)
         {
-            controller = customerController;
-            BuildUI();
+            InitializeComponent();
+            customersController = bank.Customers;
+            transfersController = bank.Transfers;
             PopulateCustomers(initialCustomer);
-        }
-
-        private void BuildUI()
-        {
-            Text = "Intra-Account Transfer";
-            ClientSize = new Size(480, 486);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-
-            Controls.Add(CreateBrandBar("Intra-Account Transfer  -  move funds between your own accounts"));
-
-            var lblCustHead = CreateFieldLabel("CUSTOMER PROFILE");
-            lblCustHead.Location = new Point(24, 78);
-            lblCustHead.Size = new Size(432, 16);
-
-            cmbCustomer = CreateStyledComboBox();
-            cmbCustomer.Location = new Point(24, 96);
-            cmbCustomer.Size = new Size(432, 26);
-            cmbCustomer.SelectedIndexChanged += cmbCustomer_SelectedIndexChanged;
-
-            var divider = new Panel();
-            divider.Location = new Point(24, 136);
-            divider.Size = new Size(432, 1);
-            divider.BackColor = Color.FromArgb(35, 52, 88);
-
-            var lblFrom = CreateFieldLabel("TRANSFER FROM  (SOURCE)");
-            lblFrom.Location = new Point(24, 150);
-            lblFrom.Size = new Size(432, 16);
-
-            cmbSource = CreateStyledComboBox();
-            cmbSource.Location = new Point(24, 168);
-            cmbSource.Size = new Size(432, 26);
-            cmbSource.SelectedIndexChanged += (s, e) => UpdateBalances();
-
-            lblSourceBal = new Label();
-            lblSourceBal.Location = new Point(24, 198);
-            lblSourceBal.Size = new Size(432, 16);
-            lblSourceBal.ForeColor = Gold;
-            lblSourceBal.Font = new Font("Segoe UI", 8f);
-
-            var lblTo = CreateFieldLabel("TRANSFER TO  (DESTINATION)");
-            lblTo.Location = new Point(24, 226);
-            lblTo.Size = new Size(432, 16);
-
-            cmbDestination = CreateStyledComboBox();
-            cmbDestination.Location = new Point(24, 244);
-            cmbDestination.Size = new Size(432, 26);
-            cmbDestination.SelectedIndexChanged += (s, e) => UpdateBalances();
-
-            lblDestBal = new Label();
-            lblDestBal.Location = new Point(24, 274);
-            lblDestBal.Size = new Size(432, 16);
-            lblDestBal.ForeColor = Gold;
-            lblDestBal.Font = new Font("Segoe UI", 8f);
-
-            var lblAmtHead = CreateFieldLabel("AMOUNT  ($NZD)");
-            lblAmtHead.Location = new Point(24, 302);
-            lblAmtHead.Size = new Size(432, 16);
-
-            txtAmount = CreateStyledTextBox();
-            txtAmount.Location = new Point(24, 320);
-            txtAmount.Size = new Size(200, 28);
-            txtAmount.PlaceholderText = "0.00";
-            txtAmount.KeyPress += txtAmount_KeyPress;
-
-            lblStaff = new Label();
-            lblStaff.Location = new Point(24, 356);
-            lblStaff.Size = new Size(432, 16);
-            lblStaff.ForeColor = Color.FromArgb(110, 130, 170);
-            lblStaff.Font = new Font("Segoe UI", 7.5f, FontStyle.Italic);
-
-            btnExecute = CreatePrimaryButton("EXECUTE TRANSFER");
-            btnExecute.Location = new Point(24, 384);
-            btnExecute.Size = new Size(200, 38);
-            btnExecute.Click += btnExecute_Click;
-
-            var btnClose = CreateNeutralButton("CLOSE");
-            btnClose.Location = new Point(236, 384);
-            btnClose.Size = new Size(90, 38);
-            btnClose.Click += (s, e) => Close();
-
-            lblResult = new Label();
-            lblResult.Location = new Point(24, 432);
-            lblResult.Size = new Size(432, 44);
-            lblResult.ForeColor = TextGray;
-            lblResult.Font = new Font("Segoe UI", 8f);
-
-            Controls.AddRange(new Control[]
-            {
-                lblCustHead, cmbCustomer, divider,
-                lblFrom, cmbSource, lblSourceBal,
-                lblTo, cmbDestination, lblDestBal,
-                lblAmtHead, txtAmount, lblStaff,
-                btnExecute, btnClose, lblResult
-            });
-
-            AcceptButton = btnExecute;
-            CancelButton = btnClose;
         }
 
         private void PopulateCustomers(User? initialCustomer)
@@ -132,7 +27,7 @@ namespace _20231503_ManishRay_Assignment3
             cmbCustomer.SelectedIndexChanged -= cmbCustomer_SelectedIndexChanged;
             cmbCustomer.Items.Clear();
 
-            var customers = controller.GetAllCustomers();
+            var customers = customersController.GetAllCustomers();
             foreach (var c in customers)
             {
                 cmbCustomer.Items.Add($"{c.Name}  ({c.GetRoleLabel()})  -  #{c.CustomerNumber}");
@@ -160,7 +55,7 @@ namespace _20231503_ManishRay_Assignment3
 
         private void cmbCustomer_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            var customers = controller.GetAllCustomers();
+            var customers = customersController.GetAllCustomers();
             if (cmbCustomer.SelectedIndex < 0 || cmbCustomer.SelectedIndex >= customers.Count)
             {
                 return;
@@ -169,6 +64,10 @@ namespace _20231503_ManishRay_Assignment3
             customer = customers[cmbCustomer.SelectedIndex];
             PopulateAccountCombos();
         }
+
+        private void cmbSource_SelectedIndexChanged(object? sender, EventArgs e) => UpdateBalances();
+
+        private void cmbDestination_SelectedIndexChanged(object? sender, EventArgs e) => UpdateBalances();
 
         private void PopulateAccountCombos()
         {
@@ -243,7 +142,7 @@ namespace _20231503_ManishRay_Assignment3
 
             try
             {
-                string result = controller.TransferFunds(
+                string result = transfersController.TransferFunds(
                     customer.CustomerNumber,
                     cmbSource.SelectedIndex,
                     cmbDestination.SelectedIndex,
@@ -263,6 +162,8 @@ namespace _20231503_ManishRay_Assignment3
 
             RefreshAccountCombos();
         }
+
+        private void btnClose_Click(object? sender, EventArgs e) => Close();
 
         private void RefreshAccountCombos()
         {

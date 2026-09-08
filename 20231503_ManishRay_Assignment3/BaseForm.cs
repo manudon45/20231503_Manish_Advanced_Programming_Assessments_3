@@ -1,6 +1,9 @@
 namespace _20231503_ManishRay_Assignment3
 {
-    public class BaseForm : Form
+    // Visual-inheritance base form. Every window inherits this class so the palette, fonts and
+    // control styling are defined once. It carries its own designer file (BaseForm.Designer.cs)
+    // so it - and every form derived from it - opens in the Windows Forms designer.
+    public partial class BaseForm : Form
     {
         protected static readonly Color NavyDark = Color.FromArgb(15, 27, 53);
         protected static readonly Color NavyMid = Color.FromArgb(27, 42, 74);
@@ -17,11 +20,7 @@ namespace _20231503_ManishRay_Assignment3
 
         public BaseForm()
         {
-            BackColor = NavyDark;
-            ForeColor = Color.White;
-            Font = new Font("Segoe UI", 9f);
-            StartPosition = FormStartPosition.CenterParent;
-            AutoScaleMode = AutoScaleMode.Font;
+            InitializeComponent();
         }
 
         protected Panel CreateBrandBar(string subtitle)

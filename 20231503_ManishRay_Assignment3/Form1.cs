@@ -7,7 +7,7 @@ namespace _20231503_ManishRay_Assignment3
     public partial class Form1 : BaseForm
     {
         // Data: customer controller instance
-        private readonly CustomerController customerController;
+        private readonly BankController bank;
         private User currentUser = null!;
         private Account currentAccount = null!;
 
@@ -32,20 +32,53 @@ namespace _20231503_ManishRay_Assignment3
         public Form1()
         {
             InitializeComponent();
-            customerController = new CustomerController();
+            bank = new BankController();
             BuildUI();
-            PopulateUserDropdown();
         }
 
+        // Task 5: restore the saved system state from the JSON store as the application loads.
         private void Form1_Load(object? sender, EventArgs e)
         {
+            bool restored = bank.LoadData();
+            PopulateUserDropdown();
+
+            if (restored)
+            {
+                LogTransaction($"Session data restored from {bank.StoragePath}");
+            }
+            else
+            {
+                LogTransaction("No saved data found - started with default demo customers.");
+            }
+        }
+
+        // Task 5: persist the whole system state to the JSON store when the application closes.
+        private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                bank.SaveData();
+            }
+            catch (BankingException ex)
+            {
+                DialogResult choice = MessageBox.Show(
+                    $"The system could not save your data:\n\n{ex.Message}\n\nClose anyway?",
+                    "Save Failed",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (choice == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
         private void PopulateUserDropdown()
         {
             cmbUser.SelectedIndexChanged -= cmbUser_SelectedIndexChanged;
             cmbUser.Items.Clear();
-            foreach (var user in customerController.GetAllCustomers())
+            foreach (var user in bank.Customers.GetAllCustomers())
             {
                 cmbUser.Items.Add($"{user.Name} ({user.GetRoleLabel()})");
             }
@@ -226,7 +259,7 @@ namespace _20231503_ManishRay_Assignment3
                 return;
             }
 
-            using var dialog = new AddAccountForm(customerController, currentUser);
+            using var dialog = new AddAccountForm(bank, currentUser);
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 RebuildAccountTabs();
@@ -242,7 +275,7 @@ namespace _20231503_ManishRay_Assignment3
                 return;
             }
 
-            using var dialog = new TransferForm(customerController, currentUser);
+            using var dialog = new TransferForm(bank, currentUser);
             dialog.ShowDialog();
 
             if (dialog.TransferPerformed)
@@ -275,7 +308,7 @@ namespace _20231503_ManishRay_Assignment3
 
         private void btnManageCustomers_Click(object? sender, EventArgs e)
         {
-            var form = new CustomerManagementForm(customerController);
+            var form = new CustomerManagementForm(bank);
             form.ShowDialog();
             PopulateUserDropdown();
         }
@@ -585,7 +618,7 @@ namespace _20231503_ManishRay_Assignment3
 
         private void SwitchUser(int index)
         {
-            var customers = customerController.GetAllCustomers();
+            var customers = bank.Customers.GetAllCustomers();
             if (index < 0 || index >= customers.Count)
             {
                 index = 0;
@@ -611,7 +644,7 @@ namespace _20231503_ManishRay_Assignment3
         {
             if (currentUser == null)
             {
-                var customers = customerController.GetAllCustomers();
+                var customers = bank.Customers.GetAllCustomers();
                 if (customers.Count > 0)
                 {
                     currentUser = customers[0];

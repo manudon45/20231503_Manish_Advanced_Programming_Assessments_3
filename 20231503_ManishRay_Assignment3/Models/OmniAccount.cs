@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using _20231503_ManishRay_Assignment3.Exceptions;
 
 namespace _20231503_ManishRay_Assignment3.Models
@@ -11,6 +12,14 @@ namespace _20231503_ManishRay_Assignment3.Models
         public decimal OverdraftLimit { get; private set; }
 
         public OmniAccount(decimal overdraftLimit = 500m, decimal initialBalance = 750m) : base("Omni Account", initialBalance)
+        {
+            OverdraftLimit = overdraftLimit >= 0 ? overdraftLimit : 0;
+        }
+
+        // Restore constructor used by System.Text.Json when loading saved state
+        [JsonConstructor]
+        public OmniAccount(int accountId, string accountName, decimal balance, string lastTransactionStatus, decimal overdraftLimit)
+            : base(accountId, accountName, balance, lastTransactionStatus)
         {
             OverdraftLimit = overdraftLimit >= 0 ? overdraftLimit : 0;
         }

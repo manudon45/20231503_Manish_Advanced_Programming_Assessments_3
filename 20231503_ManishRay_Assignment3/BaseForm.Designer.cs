@@ -1,9 +1,8 @@
-#nullable enable
 namespace _20231503_ManishRay_Assignment3
 {
-    partial class Form1
+    partial class BaseForm
     {
-        private System.ComponentModel.IContainer? components = null;
+        private System.ComponentModel.IContainer components = null;
 
         protected override void Dispose(bool disposing)
         {
@@ -14,23 +13,24 @@ namespace _20231503_ManishRay_Assignment3
             base.Dispose(disposing);
         }
 
+        // Shared branding (navy background, white text, Segoe UI base font, DPI-aware scaling)
+        // that every derived form inherits.
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             SuspendLayout();
-            // 
-            // Form1
-            // 
+            //
+            // BaseForm
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(15, 27, 53);
-            ClientSize = new Size(980, 720);
+            ClientSize = new Size(440, 300);
+            Font = new Font("Segoe UI", 9F);
             ForeColor = Color.White;
-            MinimumSize = new Size(900, 600);
-            Name = "Form1";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "ManishRayy Bank Account Management";
-            Load += Form1_Load;
-            FormClosing += Form1_FormClosing;
+            Name = "BaseForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "ManishRayyy Bank";
             ResumeLayout(false);
         }
     }

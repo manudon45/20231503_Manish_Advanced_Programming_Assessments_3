@@ -3,92 +3,27 @@ using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3
 {
-    public class AddAccountForm : BaseForm
+    // Modal dialog for attaching a new account to an existing customer at runtime. The layout lives
+    // in AddAccountForm.Designer.cs; this file holds only the behaviour.
+    public partial class AddAccountForm : BaseForm
     {
-        private readonly CustomerController controller;
+        private readonly AccountController controller;
         private readonly User targetUser;
 
-        private ComboBox cmbType = null!;
-        private TextBox txtInitial = null!;
-        private TextBox txtExtra = null!;
-        private Label lblExtra = null!;
-
-        public AddAccountForm(CustomerController customerController, User user)
+        public AddAccountForm(BankController bank, User user)
         {
-            controller = customerController;
+            InitializeComponent();
+
+            controller = bank.Accounts;
             targetUser = user;
-            BuildUI();
+
+            lblHead.Text = $"NEW ACCOUNT FOR {targetUser.Name.ToUpperInvariant()}  (#{targetUser.CustomerNumber})";
+            cmbType.SelectedIndex = 0;
+            UpdateExtraField();
         }
 
-        private void BuildUI()
+        private void cmbType_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            Text = "Add New Account";
-            ClientSize = new Size(440, 372);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-
-            Controls.Add(CreateBrandBar("Add a new account to a customer profile"));
-
-            var lblHead = new Label
-            {
-                Text = $"NEW ACCOUNT FOR {targetUser.Name.ToUpperInvariant()}  (#{targetUser.CustomerNumber})",
-                ForeColor = Gold,
-                Font = new Font("Segoe UI", 9f, FontStyle.Bold),
-                Location = new Point(20, 80),
-                Size = new Size(400, 22)
-            };
-
-            var lblType = CreateFieldLabel("Account Type:");
-            lblType.Location = new Point(20, 120);
-            cmbType = CreateStyledComboBox();
-            cmbType.Location = new Point(170, 117);
-            cmbType.Size = new Size(240, 24);
-            cmbType.Items.AddRange(new object[] { "Everyday Account", "Investment Account", "Omni Account" });
-            cmbType.SelectedIndex = 0;
-            cmbType.SelectedIndexChanged += (s, e) => UpdateExtraField();
-
-            var lblInit = CreateFieldLabel("Initial Balance ($):");
-            lblInit.Location = new Point(20, 160);
-            txtInitial = CreateStyledTextBox();
-            txtInitial.Location = new Point(170, 157);
-            txtInitial.Size = new Size(240, 24);
-            txtInitial.PlaceholderText = "0.00";
-
-            lblExtra = CreateFieldLabel("Interest Rate:");
-            lblExtra.Location = new Point(20, 200);
-            txtExtra = CreateStyledTextBox();
-            txtExtra.Location = new Point(170, 197);
-            txtExtra.Size = new Size(240, 24);
-
-            var btnCreate = CreatePrimaryButton("CREATE ACCOUNT");
-            btnCreate.Location = new Point(170, 254);
-            btnCreate.Size = new Size(160, 36);
-            btnCreate.Click += btnCreate_Click;
-
-            var btnCancel = CreateNeutralButton("CANCEL");
-            btnCancel.Location = new Point(338, 254);
-            btnCancel.Size = new Size(72, 36);
-            btnCancel.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
-
-            var lblHint = new Label
-            {
-                Text = "Everyday accounts carry no interest, fees or overdraft.\n"
-                     + "Investment: enter an interest rate (e.g. 0.05).\n"
-                     + "Omni: enter an overdraft limit (e.g. 500.00).",
-                ForeColor = TextGray,
-                Font = new Font("Segoe UI", 7.5f),
-                Location = new Point(20, 304),
-                Size = new Size(400, 52)
-            };
-
-            Controls.AddRange(new Control[]
-            {
-                lblHead, lblType, cmbType, lblInit, txtInitial, lblExtra, txtExtra, btnCreate, btnCancel, lblHint
-            });
-
-            AcceptButton = btnCreate;
-            CancelButton = btnCancel;
             UpdateExtraField();
         }
 
@@ -152,6 +87,17 @@ namespace _20231503_ManishRay_Assignment3
                 MessageBox.Show("Unable to add the account. Please check your inputs.", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnCancel_Click(object? sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
+
+        private void lblBrandLogo_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

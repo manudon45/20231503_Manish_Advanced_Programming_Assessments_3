@@ -7,10 +7,10 @@ namespace _20231503_ManishRay_Assignment3
     {
         private readonly CustomerController controller;
 
-        public CustomerManagementForm(CustomerController customerController)
+        public CustomerManagementForm(BankController bank)
         {
             InitializeComponent();
-            controller = customerController;
+            controller = bank.Customers;
             RefreshCustomerList();
         }
 

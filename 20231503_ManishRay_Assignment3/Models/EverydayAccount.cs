@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using _20231503_ManishRay_Assignment3.Exceptions;
 
 namespace _20231503_ManishRay_Assignment3.Models
@@ -5,6 +6,13 @@ namespace _20231503_ManishRay_Assignment3.Models
     public class EverydayAccount : Account
     {
         public EverydayAccount(decimal initialBalance = 500m) : base("Everyday Account", initialBalance)
+        {
+        }
+
+        // Restore constructor used by System.Text.Json when loading saved state
+        [JsonConstructor]
+        public EverydayAccount(int accountId, string accountName, decimal balance, string lastTransactionStatus)
+            : base(accountId, accountName, balance, lastTransactionStatus)
         {
         }
 
