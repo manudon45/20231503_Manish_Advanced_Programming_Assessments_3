@@ -34,7 +34,7 @@ in the technical report. Both live one level up - see section 5.
 
 ### Prerequisites
 
-- **Visual Studio 2022** (17.8 or later) with the **.NET Desktop Development** workload.
+- **Visual Studio 2026** with the **.NET Desktop Development** workload.
 - **.NET 10.0 SDK** (`net10.0-windows` target framework).
 - No third-party NuGet packages (built-in .NET SDK + MSTest).
 
