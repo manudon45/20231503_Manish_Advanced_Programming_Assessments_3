@@ -1,0 +1,1 @@
+search_result['157']=["topic_000000000000005D_overloads--.html","BankRepository Constructor","Creates the repository with an explicit persistence service (used by the tests)."];

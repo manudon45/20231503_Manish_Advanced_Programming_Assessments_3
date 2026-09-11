@@ -1,0 +1,1 @@
+search_result['107']=["topic_0000000000000043.html","AccountController.GetAccountsForCustomer Method","Returns a customer\u0027s account list, for populating combo boxes and the tab strip."];

@@ -1,0 +1,1 @@
+search_result['106']=["topic_0000000000000042.html","AccountController.RemoveAccountFromCustomer Method","Removes one account from a customer by list position. User.RemoveAccount keeps at\r\nleast one account, so a call that would empty the list is rejected."];

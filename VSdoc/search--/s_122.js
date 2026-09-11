@@ -1,0 +1,1 @@
+search_result['122']=["topic_000000000000004B.html","BankController.LoadData Method","Restores the entire system state from the JSON file. Called from Form1_Load at\r\nstart-up; delegates to Load."];

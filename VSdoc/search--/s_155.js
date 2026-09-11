@@ -1,0 +1,1 @@
+search_result['155']=["topic_000000000000005C_overloads--.html","BankRepository Constructor","Creates the repository with the default JSON store (a file beside the executable)."];

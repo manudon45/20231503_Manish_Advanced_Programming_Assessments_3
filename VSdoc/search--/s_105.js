@@ -1,0 +1,1 @@
+search_result['105']=["topic_0000000000000041.html","AccountController.AddAccountToCustomer Method","Opens a new account for an existing customer at runtime (proving the List\u003cAccount\u003e\r\nis a true 1:N relationship). Switches on accountType to build the right\r\nconcrete Account subclass, then calls User...."];

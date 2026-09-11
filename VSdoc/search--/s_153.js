@@ -1,0 +1,1 @@
+search_result['153']=["topic_000000000000005B.html","BankRepository.Customers Property","The live in-memory model: every account holder (customers and staff)."];
