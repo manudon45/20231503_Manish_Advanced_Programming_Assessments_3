@@ -13,150 +13,24 @@ This repository contains the **Sprint 3** delivery of the Banking System Case St
 integrates the Sprint 1 domain logic and the Sprint 2 MVC structure into the final application and
 adds intra-account transfers, a dynamic one-to-many account model, and JSON data persistence.
 
-### Feature status
+### Architecture at a glance
 
-| Task | Feature | Status |
-|------|---------|--------|
-| 1 | Gherkin scenarios for intra-account transfers and staff fee logic | Complete (`Gherkin-Scenarios.docx`) |
-| 2 | `feature/sprint3-integration` branch + `.gitignore` | Complete |
-| 3 | One-to-many account model, dynamic "Add New Account", Bank Staff distinction | Complete |
-| 4 | Form inheritance (`BaseForm`), dedicated intra-account transfer screen, wireframes | Complete |
-| 5 | JSON serialization with polymorphic account types, auto save/load | Complete (`Persistence/`, `Task5-JSON-Persistence-Sequence-Diagram.md`) |
-| 6 | Manual test plan and results table | Complete (`Task6-Test-Plan-and-Results.md`; 54 automated tests) |
-| 7 | Controller XML documentation + generated report | Complete (`/// <summary>` on all controllers; `Task7-Controller-Technical-Documentation.html`/`.pdf` via `tools/generate-docs.mjs`) |
-| 8 | 3-page bank staff user guide | Complete (`Task8-User-Guide.html`/`.pdf`, real app screenshots in `img/`) |
+- **Model** - `User` (abstract) with `Customer` / `BankStaff`; `Account` (abstract) with
+  `EverydayAccount` / `InvestmentAccount` / `OmniAccount`. A user owns `1..*` accounts.
+- **Controller** - `BankController` is the facade the forms hold; it owns one `BankRepository`
+  and exposes `.Customers`, `.Accounts` and `.Transfers`, plus `LoadData()` / `SaveData()`.
+- **View** - `Form1`, `CustomerManagementForm`, `AddAccountForm` and `TransferForm`, all
+  inheriting `BaseForm` for consistent branding.
+- **Persistence** - `JsonPersistenceService` writes a `BankDataFile` envelope to `bank_data.json`
+  using `System.Text.Json` with `[JsonPolymorphic]` type discriminators.
 
----
-
-## 2. Sprint 3 - Task 3: Architectural Evolution (One-to-Many)
-
-Sprint 1 and Sprint 2 gave every customer exactly three accounts created in the constructor. Sprint 3
-turns the `List<Account>` into a true one-to-many relationship that can grow at runtime through the
-Controller.
-
-### Model changes
-
-- **`User`** (abstract base)
-  - `AddAccount(Account account)` - attaches a new account to the `Accounts` collection.
-  - `RemoveAccount(Account account)` - detaches an account, always keeping a minimum of one.
-- **`Customer` / `BankStaff`** - unchanged construction, but the account list is no longer fixed in size.
-
-### Bank Staff distinction
-
-The architectural difference between a regular customer and a staff member is modelled with
-**inheritance plus a polymorphic flag**:
-
-- `User.IsStaff` is an `abstract bool` property.
-- `Customer` overrides it to return `false`; `BankStaff` overrides it to return `true` and adds a
-  `StaffId` attribute.
-- `Account.Deposit` / `Account.Withdraw` accept an `isStaff` argument; when `true` the failed
-  transaction fee on Investment and Omni accounts is halved (the 50% Bank Staff Benefit).
-
-### Segregated controllers
-
-The single controller from Sprint 2 is split by responsibility. All share one `BankRepository`
-(the in-memory `List<User>` + the JSON persistence layer). `BankController` is the facade the UI
-holds; it exposes `.Customers`, `.Accounts`, `.Transfers` and the whole-system `LoadData()` /
-`SaveData()`.
-
-| Controller | Methods |
-|------------|---------|
-| `CustomerController` | `GetAllCustomers`, `GetCustomerByNumber`, `GetCustomerByIndex`, `GetCustomerCount`, `AddCustomer`, `UpdateCustomer`, `DeleteCustomer` |
-| `AccountController` | `AddAccountToCustomer(customerNumber, accountType, initialBalance, extraParameter)`, `RemoveAccountFromCustomer(customerNumber, accountIndex)`, `GetAccountsForCustomer(customerNumber)` |
-| `TransferController` | `TransferFunds(customerNumber, sourceIndex, destinationIndex, amount)` |
-| `BankController` (facade) | `Customers`, `Accounts`, `Transfers`, `LoadData()`, `SaveData()`, `StoragePath` |
-
-### UI changes
-
-- The main dashboard account tabs are now generated dynamically from `currentUser.Accounts`
-  inside a horizontally scrolling `FlowLayoutPanel`, so any number of accounts is supported.
-- A new **"+ ADD ACCOUNT"** button opens `AddAccountForm`, a modal dialog that uses `ComboBox`
-  selection for the account type and adds the account through the Controller (not the Form).
-- Switching the active user rebuilds the tab strip.
-
-### Supporting documents
-
-- `Task3-Class-Extensions-Report.md` - full attribute and method-signature report for the
-  `Customer`, `Account` and `Controller` classes.
-- `AdvancedProgrammingUMLDiagrams.drawio` - updated class diagram showing the `1 --- 0..*`
-  Customer/Account association and the Bank Staff distinction.
+The full class-by-class breakdown (attributes, method signatures, and what changed since Sprint 2)
+is in the Class Extensions Report; the UML class diagram and the persistence sequence diagrams are
+in the technical report. Both live one level up - see section 5.
 
 ---
 
-## 2b. Sprint 3 - Task 4: High-Fidelity UI & Form Inheritance
-
-### Visual inheritance - `BaseForm`
-
-`BaseForm : Form` is the single source of visual truth. Every window inherits it:
-`Form1`, `CustomerManagementForm`, `AddAccountForm` and `TransferForm`.
-
-`BaseForm` provides:
-
-- the palette constants (`NavyDark`, `Gold`, `TextGray`, ...) as `protected` members;
-- a constructor that applies `BackColor` / `ForeColor` / `Font` / `AutoScaleMode`;
-- `CreateBrandBar(subtitle)` - the gold "MB" logo + "ManishRayyy Bank" title strip;
-- control factories: `CreatePrimaryButton` / `CreateAccentButton` / `CreateNeutralButton` /
-  `CreateDangerButton`, `CreateFieldLabel`, `CreateStyledTextBox`, `CreateStyledComboBox`.
-
-### Intra-account transfer
-
-- **Controller logic** (`TransferController.TransferFunds(customerNumber, sourceIndex,
-  destinationIndex, amount)`) lives in the Controller, not the Form. It validates the customer,
-  the account indices, that source and destination differ, and a positive amount, then reuses
-  `Account.Withdraw` / `Account.Deposit` so overdraft limits, balance checks and the
-  staff-discounted failed-transaction fee all apply. A failed withdrawal aborts the transfer
-  before any money reaches the destination (no partial transfers).
-- **`TransferForm`** is the dedicated screen: a customer `ComboBox`, plus **Source** and
-  **Destination** `ComboBox` pickers populated from that customer's `Accounts` (no free-text
-  entry), a live balance caption under each, an amount field, and a green/red result line.
-  Opened from the dashboard's **TRANSFER »** button, primed with the active user.
-
-### Navigation / wireframes
-
-- `Task4-UI-Wireframes-and-Sitemap.md` - sitemap (Mermaid), navigation flow, ASCII wireframes for
-  every screen (with a detailed layout for the new Intra-Account Transfer interface), and the
-  form-inheritance tree.
-
----
-
-## 2c. Sprint 3 - Task 5: JSON Data Persistence
-
-The system state is saved to and restored from a local JSON file using **`System.Text.Json`**.
-
-### Automatic save / load
-
-- **`Form1.Load`** -> `BankController.LoadData()` -> `BankRepository.Load()` -> `JsonPersistenceService.Load()`.
-- **`Form1.FormClosing`** -> `BankController.SaveData()` -> `BankRepository.Save()` -> `JsonPersistenceService.Save()`.
-- The file, `bank_data.json`, sits next to the executable (`AppContext.BaseDirectory`); the path is
-  exposed as `BankController.StoragePath`.
-
-### Polymorphic account / user types
-
-`Account` and `User` are abstract. Both are annotated with `[JsonPolymorphic]` +
-`[JsonDerivedType]`, so the serializer writes a `"$type"` discriminator
-(`everyday` / `investment` / `omni`, `customer` / `staff`) and rebuilds the correct concrete class
-on load via a dedicated `[JsonConstructor]` restore constructor.
-
-### Data-integrity safeguards
-
-- **Atomic write:** serialized to `bank_data.json.tmp` then `File.Move(overwrite:true)` - the live
-  file is never half-written.
-- **Corrupt / wrong-schema file:** renamed to `bank_data.json.corrupt-<timestamp>` (not deleted) and
-  the session falls back to seed data.
-- **Account id collisions:** `Account.SyncIdSeed()` advances the id counter past every restored id.
-- **Save failure:** wrapped in `PersistenceException`; the closing form offers "close anyway?".
-
-### Supporting documents
-
-- `Task5-JSON-Persistence-Sequence-Diagram.md` - save-flow and load-flow sequence diagrams
-  (Controller -> `JsonPersistenceService` -> `JsonSerializer` -> `bank_data.json`), the
-  `[JsonDerivedType]` explanation and a sample `bank_data.json`.
-- `20231503_ManishRay_Assignment3.Tests/JsonPersistenceServiceTests.cs` - 9 module tests
-  (polymorphic round-trip, staff role, domain rules after load, corrupt file, schema check).
-
----
-
-## 3. Prerequisites & Opening the Solution
+## 2. Prerequisites & Opening the Solution
 
 ### Prerequisites
 
@@ -183,7 +57,7 @@ solution folder before zipping.
 
 ---
 
-## 4. Running the Application
+## 3. Running the Application
 
 ### Visual Studio
 
@@ -197,6 +71,9 @@ solution folder before zipping.
    - Click **TRANSFER »** to move funds between the customer's own accounts.
    - Click **MANAGE CUSTOMERS** to add, update or delete customers.
 
+Data is restored automatically when the window opens and saved automatically when it closes -
+there is no save button. The store is `bank_data.json`, written next to the executable.
+
 ### Command line
 
 ```bash
@@ -205,7 +82,7 @@ dotnet run --project "20231503_ManishRay_Assignment3/20231503_ManishRay_Assignme
 
 ---
 
-## 5. Unit Tests
+## 4. Unit Tests
 
 ### Visual Studio
 
@@ -231,10 +108,15 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
   survive a restart).
 - `CustomerControllerTests` / `AccountControllerTests`: CRUD, staff creation, last-customer
   guard, 1:N add/remove, unknown-customer / unknown-type handling.
+- `EverydayAccountTests` / `InvestmentAccountTests` / `OmniAccountTests`: the Sprint 1 domain
+  rules - deposits, withdrawals, overdraft limits, interest and the staff-discounted failed fee.
+
+> If the test host reports that a file was blocked by an Application Control policy, run the tests
+> from Visual Studio instead - that is a machine security-policy restriction, not a build failure.
 
 ---
 
-## 6. Project Structure
+## 5. Project Structure
 
 ```text
 20231503_Manish_Advanced_Programming_Assessments_3/
@@ -249,10 +131,10 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 │   ├── Exceptions/
 │   │   ├── BankingException.cs
 │   │   ├── InsufficientFundsException.cs
-│   │   └── PersistenceException.cs                 # JSON save/load failure (Task 5)
+│   │   └── PersistenceException.cs                  # JSON save/load failure (Task 5)
 │   ├── Persistence/
-│   │   ├── BankDataFile.cs                         # Serialized root envelope (Task 5)
-│   │   └── JsonPersistenceService.cs               # System.Text.Json save / load layer (Task 5)
+│   │   ├── BankDataFile.cs                          # Serialized root envelope (Task 5)
+│   │   └── JsonPersistenceService.cs                # System.Text.Json save / load layer (Task 5)
 │   ├── Models/
 │   │   ├── Account.cs                               # Abstract account base
 │   │   ├── EverydayAccount.cs
@@ -268,7 +150,7 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 │   ├── TransferForm.cs / .Designer.cs               # Intra-account transfer modal (Task 4)
 │   └── Program.cs
 │
-├── 20231503_ManishRay_Assignment3.Tests/           # MSTest project (54 tests)
+├── 20231503_ManishRay_Assignment3.Tests/            # MSTest project (54 tests)
 │   ├── EverydayAccountTests.cs
 │   ├── InvestmentAccountTests.cs
 │   ├── OmniAccountTests.cs
@@ -277,17 +159,52 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 │   ├── TransferControllerTests.cs                   # Task 6 - the Task 1 Gherkin, scenario by scenario
 │   └── JsonPersistenceServiceTests.cs               # Task 5 - JSON round-trip / edge cases
 │
+├── VSdoc/                                           # Task 7 - generated API documentation (VSdocman)
+│   └── index.html                                   # Entry point; one topic page per namespace / type / member
+│
+├── AdvancedProgrammingUMLDiagrams.drawio            # Task 3 - updated UML class diagram (source)
+├── Directory.Build.props                            # Redirects build output to ../.artifacts
+├── 20231503_ManishRay_Assignment3.slnx              # Solution file
+├── .gitignore
 └── README.md
 ```
 
-Planning / hand-over documents live one level up (submitted to Canvas separately)
+Planning and hand-over documents live one level up and are submitted to Canvas separately:
+
+| File | Task |
+|------|------|
+| `20231503_Manish_Kumar_Ray_Report.docx` | 3, 4, 5 - UML class diagram, UI wireframes, persistence sequence diagrams |
+| `20231503_Manish_Kumar_Ray_Gherkin_Scenarios.docx` | 1 - Gherkin feature file |
+| `20231503_Manish_Kumar_Ray_Class_Extensions_Report.docx` | 3 - attributes and method signatures |
+| `20231503_Manish_Kumar_Ray_Test_Results.docx` | 6 - test plan, results table, debugging log |
+| `20231503_Manish_Kumar_Ray_User_Guide.docx` | 8 - 3-page bank staff user guide |
+| `Generated references/` | Source material and the generated Task 7 documentation report |
+| `img/`, `sequence diagram/` | Screenshots and exported diagram images used in the documents |
 
 ---
 
-## 7. Version Control
+## 6. Version Control
 
-- Development branch: **`feature/sprint3-integration`** (no work on `main`).
-- `.gitignore` excludes `bin/`, `obj/`, `.vs/` and other IDE/build artefacts. Builds are additionally
-  redirected out of the repo via `Directory.Build.props` (`UseArtifactsOutput`) - see
-  "Build output location" above.
-- The feature branch is merged into `main` once Task 5 is functional to mark the project release.
+- Development branch: **`feature/sprint3-integration`** - all Sprint 3 work was committed here, with
+  no development on `main`.
+- `.gitignore` excludes `bin/`, `obj/`, `.vs/` and other IDE/build artefacts, plus the runtime data
+  files (`bank_data.json`, `bank_data.json.tmp`, `bank_data.json.corrupt-*`). Builds are
+  additionally redirected out of the repo via `Directory.Build.props` (`UseArtifactsOutput`) - see
+  "Build output location" in section 2.
+- Commit history on the feature branch, oldest first:
+
+  | Commit | Message |
+  |--------|---------|
+  | `da247f3` | feat: Adding new account, updated models and UML |
+  | `fcf67a1` | feat: Updated UML |
+  | `5dcba50` | feat: Transfer feature and UI revamp |
+  | `af87893` | feat: JSON persistence implemented, controllers seggregated |
+  | `1276830` | feat: XML comments added for document generation, test cases updated |
+  | `4780474` | feat: VSdocman used for XML document generation |
+  | `d2da755` | feat: XML documentation generated to html |
+  | `ef5cfb4` | feat: Updated UML |
+
+- **Release:** `feature/sprint3-integration` was merged into `main` through **pull request #1**
+  (merge commit `da60a68`), marking the Sprint 3 release. It is a true merge commit rather than a
+  fast-forward or a squash, so the feature branch and the point where it rejoined `main` both stay
+  visible in `git log --graph --all`.
