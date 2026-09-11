@@ -1,0 +1,1 @@
+search_result['119']=["topic_0000000000000049.html","BankController(JsonPersistenceService) Constructor","Creates the controller with an explicit persistence service (used by the tests)."];

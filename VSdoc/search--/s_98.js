@@ -1,0 +1,1 @@
+search_result['98']=["topic_000000000000003F.html","AccountController Class","MVC controller for the one-to-many side of the model: adding, removing and listing the\r\naccounts a customer holds. Works against the shared BankRepository."];

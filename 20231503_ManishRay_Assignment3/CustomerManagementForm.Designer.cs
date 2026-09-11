@@ -418,6 +418,7 @@ namespace _20231503_ManishRay_Assignment3
             lblFormHead.Size = new Size(460, 28);
             lblFormHead.TabIndex = 2;
             lblFormHead.Text = "CUSTOMER DETAILS & ACTIONS";
+            lblFormHead.UseMnemonic = false;
             // 
             // lstCustomers
             // 

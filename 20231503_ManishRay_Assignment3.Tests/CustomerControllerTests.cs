@@ -11,18 +11,15 @@ namespace _20231503_ManishRay_Assignment3.Tests
         [TestInitialize]
         public void Setup()
         {
-            controller = new CustomerController();
+            controller = new BankController().Customers;
         }
 
-        // Test initial seeded customers load
         [TestMethod]
         public void GetAllCustomers_ReturnsSeededCustomers()
         {
-            var customers = controller.GetAllCustomers();
-            Assert.IsTrue(customers.Count >= 2);
+            Assert.IsGreaterThanOrEqualTo(2, controller.GetAllCustomers().Count);
         }
 
-        // Test adding a new customer
         [TestMethod]
         public void AddCustomer_ValidInput_IncreasesCount()
         {
@@ -33,7 +30,16 @@ namespace _20231503_ManishRay_Assignment3.Tests
             Assert.AreEqual(initialCount + 1, controller.GetCustomerCount());
         }
 
-        // Test updating customer details
+        [TestMethod]
+        public void AddCustomer_StaffRole_CreatesBankStaffWithBenefit()
+        {
+            controller.AddCustomer("Staff Member", "021-999", true, "STF-1234", 500m, 0.05m, 1000m, 500m, 750m);
+            User? added = controller.GetCustomerByNumber("C-2026-003");
+
+            Assert.IsInstanceOfType<BankStaff>(added);
+            Assert.IsTrue(added.IsStaff);
+        }
+
         [TestMethod]
         public void UpdateCustomer_ValidId_UpdatesDetails()
         {
@@ -46,7 +52,6 @@ namespace _20231503_ManishRay_Assignment3.Tests
             Assert.AreEqual("newemail@test.com", updated.ContactDetails);
         }
 
-        // Test deleting a customer
         [TestMethod]
         public void DeleteCustomer_ValidId_RemovesCustomer()
         {
@@ -56,6 +61,16 @@ namespace _20231503_ManishRay_Assignment3.Tests
             Assert.IsTrue(result);
             Assert.AreEqual(countBefore - 1, controller.GetCustomerCount());
             Assert.IsNull(controller.GetCustomerByNumber("C-2026-001"));
+        }
+
+        [TestMethod]
+        public void DeleteCustomer_LastRemaining_IsRejected()
+        {
+            controller.DeleteCustomer("C-2026-001");
+            bool result = controller.DeleteCustomer("C-2026-002");
+
+            Assert.IsFalse(result);
+            Assert.AreEqual(1, controller.GetCustomerCount());
         }
     }
 }

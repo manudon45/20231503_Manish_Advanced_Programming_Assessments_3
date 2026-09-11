@@ -1,0 +1,1 @@
+var breadcrumbs=[['-1',"",""],['2',"SOLUTION-WIDE PROPERTIES Reference","topic_00000000000000DE.html"],['210',"_20231503_ManishRay_Assignment3.Tests Namespace","topic_0000000000000000.html"],['241',"JsonPersistenceServiceTests Class","topic_000000000000001B.html"],['242',"Methods","topic_000000000000001B_methods--.html"],['244',"Cleanup Method","topic_000000000000001D.html"]];

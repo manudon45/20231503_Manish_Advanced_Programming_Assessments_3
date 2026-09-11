@@ -1,0 +1,1 @@
+var breadcrumbs=[['-1',"",""],['2',"SOLUTION-WIDE PROPERTIES Reference","topic_00000000000000DE.html"],['96',"_20231503_ManishRay_Assignment3.Exceptions Namespace","topic_0000000000000064.html"],['108',"PersistenceException Class","topic_000000000000006D.html"],['109',"PersistenceException Constructor","topic_000000000000006F.html"]];

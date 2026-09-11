@@ -1,0 +1,1 @@
+search_result['138']=["topic_0000000000000056.html","TransferController Class","MVC controller for Sprint 3\u0027s headline feature: intra-account transfers. Moves money between\r\ntwo accounts owned by the same customer (cross-customer transfers are out of scope). All the\r\ntransfer log..."];

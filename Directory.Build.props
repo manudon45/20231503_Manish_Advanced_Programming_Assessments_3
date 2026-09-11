@@ -1,0 +1,19 @@
+<Project>
+
+  <!--
+    Windows MAX_PATH (260 character) workaround.
+
+    This solution lives under a deep folder path, and the .NET SDK / Microsoft.Testing.Platform
+    generate long file names under obj\ (e.g.
+    "<project>.gentestingplatformentrypointinputcache.cache") that push the full path past the
+    260-character limit, which breaks "dotnet build" / "dotnet test".
+
+    UseArtifactsOutput consolidates every project's bin\ and obj\ into a single ".artifacts"
+    folder placed ONE level above the solution folder, which keeps the generated paths short.
+  -->
+  <PropertyGroup>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\.artifacts'))</ArtifactsPath>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,1 @@
+var breadcrumbs=[['-1',"",""],['2',"SOLUTION-WIDE PROPERTIES Reference","topic_00000000000000DE.html"],['194',"_20231503_ManishRay_Assignment3.Persistence Namespace","topic_00000000000000AD.html"],['195',"BankDataFile Class","topic_00000000000000AE.html"],['196',"Properties","topic_00000000000000AE_props--.html"],['199',"SchemaVersion Property","topic_00000000000000AF.html"]];

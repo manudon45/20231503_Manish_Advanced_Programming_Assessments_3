@@ -1,0 +1,1 @@
+search_result['147']=["topic_000000000000005A.html","BankRepository Class","The single shared data store. Every controller reads and writes this one instance, so the\r\ncustomer list and the JSON persistence layer are not duplicated. Also holds the two lookup\r\nhelpers the contr..."];

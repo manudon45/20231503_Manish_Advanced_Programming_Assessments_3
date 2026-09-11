@@ -1,0 +1,1 @@
+search_result['124']=["topic_000000000000004D.html","CustomerController Class","MVC controller for customer CRUD. Account operations live in AccountController\r\nand transfers in TransferController; all three share the one\r\nBankRepository passed in here."];

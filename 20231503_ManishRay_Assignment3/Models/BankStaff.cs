@@ -1,14 +1,18 @@
+using System.Text.Json.Serialization;
+
 namespace _20231503_ManishRay_Assignment3.Models
 {
     public class BankStaff : User
     {
         public string StaffId { get; private set; }
 
+        [JsonIgnore]
         public override bool IsStaff
         {
             get { return true; }
         }
 
+        // Convenience constructor: opens the three standard staff accounts
         public BankStaff(
             string customerNumber,
             string name,
@@ -28,6 +32,19 @@ namespace _20231503_ManishRay_Assignment3.Models
                 new InvestmentAccount(investmentRate, investmentBalance),
                 new OmniAccount(omniOverdraft, omniBalance)
             };
+        }
+
+        // Restore constructor used by System.Text.Json: rebuilds the staff member with the
+        // exact staff id and account list that were read back from the JSON store
+        [JsonConstructor]
+        public BankStaff(string customerNumber, string name, string contactDetails, string staffId, List<Account> accounts)
+            : base(customerNumber, name, contactDetails)
+        {
+            StaffId = staffId;
+            if (accounts is { Count: > 0 })
+            {
+                Accounts = accounts;
+            }
         }
 
         public override string GetRoleLabel()

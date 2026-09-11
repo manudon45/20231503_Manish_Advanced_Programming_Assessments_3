@@ -8,5 +8,11 @@ namespace _20231503_ManishRay_Assignment3.Exceptions
         {
             AccountType = accountType;
         }
+
+        public BankingException(string message, string accountType, Exception? innerException)
+            : base(message, innerException)
+        {
+            AccountType = accountType;
+        }
     }
 }

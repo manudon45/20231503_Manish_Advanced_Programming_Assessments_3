@@ -1,0 +1,1 @@
+var breadcrumbs=[['-1',"",""],['2',"SOLUTION-WIDE PROPERTIES Reference","topic_00000000000000DE.html"],['112',"_20231503_ManishRay_Assignment3.Models Namespace","topic_0000000000000070.html"],['145',"EverydayAccount Class","topic_0000000000000088.html"],['149',"Methods","topic_0000000000000088_methods--.html"],['152',"Withdraw Method","topic_000000000000008C.html"]];

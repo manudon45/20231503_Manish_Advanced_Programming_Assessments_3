@@ -1,0 +1,1 @@
+var breadcrumbs=[['-1',"",""],['2',"SOLUTION-WIDE PROPERTIES Reference","topic_00000000000000DE.html"],['112',"_20231503_ManishRay_Assignment3.Models Namespace","topic_0000000000000070.html"],['113',"Account Class","topic_0000000000000071.html"],['122',"Methods","topic_0000000000000071_methods--.html"],['126',"SyncIdSeed Method","topic_0000000000000079.html"]];

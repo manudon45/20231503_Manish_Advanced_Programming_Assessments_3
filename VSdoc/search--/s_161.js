@@ -1,0 +1,1 @@
+search_result['161']=["topic_0000000000000061.html","BankRepository.Save Method","Serializes the whole model (all customers and their polymorphic accounts) to the JSON file."];

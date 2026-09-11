@@ -1,0 +1,1 @@
+search_result['134']=["topic_0000000000000052.html","CustomerController.AddCustomer Method","Creates a new account holder and appends them to the model: generates the next\r\nC-2026-NNN id, then builds a BankStaff when isStaff\r\nis set or a Customer otherwise, opening the three standard accounts..."];

@@ -1,54 +1,63 @@
+using _20231503_ManishRay_Assignment3.Data;
 using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3.Controllers
 {
+    /// <summary>
+    /// MVC controller for customer CRUD. Account operations live in <see cref="AccountController"/>
+    /// and transfers in <see cref="TransferController"/>; all three share the one
+    /// <see cref="BankRepository"/> passed in here.
+    /// </summary>
     public class CustomerController
     {
-        private List<User> customerList;
+        private readonly BankRepository repository;
 
-        public CustomerController()
+        /// <summary>Creates the controller over the shared in-memory model + persistence layer.</summary>
+        /// <param name="repository">The shared repository.</param>
+        public CustomerController(BankRepository repository)
         {
-            customerList = new List<User>();
-            // Add default sample users
-            customerList.Add(new Customer("C-2026-001", "Manish Regular", "021-555-0123 | mr@mbk.nz"));
-            customerList.Add(new BankStaff("C-2026-002", "Manish BankStaff", "021-555-0199 | mbs@mbk.nz", "STF-0042"));
+            this.repository = repository;
         }
 
-        // Returns all customers
+        /// <summary>Returns the live list of every account holder in the system (customers and staff).</summary>
+        /// <returns>The repository's <c>List&lt;User&gt;</c> - read it, do not replace it.</returns>
         public List<User> GetAllCustomers()
         {
-            return customerList;
+            return repository.Customers;
         }
 
-        // Find customer by customer ID string
+        /// <summary>Finds one account holder by customer number (trimmed, case-insensitive).</summary>
+        /// <param name="customerNumber">The customer id, e.g. <c>"C-2026-001"</c>.</param>
+        /// <returns>The matching <see cref="User"/>, or <c>null</c> when blank or not found.</returns>
         public User? GetCustomerByNumber(string customerNumber)
         {
-            if (string.IsNullOrWhiteSpace(customerNumber))
-            {
-                return null;
-            }
-
-            foreach (var cust in customerList)
-            {
-                if (string.Equals(cust.CustomerNumber?.Trim(), customerNumber.Trim(), StringComparison.OrdinalIgnoreCase))
-                {
-                    return cust;
-                }
-            }
-            return null;
+            return repository.FindByNumber(customerNumber);
         }
 
-        // Get customer by list index
+        /// <summary>Gets the account holder at a list position (used by the management form's list box).</summary>
+        /// <param name="index">Zero-based position in <see cref="GetAllCustomers"/>.</param>
+        /// <returns>The <see cref="User"/> at that index, or <c>null</c> when out of range.</returns>
         public User? GetCustomerByIndex(int index)
         {
-            if (index >= 0 && index < customerList.Count)
-            {
-                return customerList[index];
-            }
-            return null;
+            return repository.FindByIndex(index);
         }
 
-        // Add a new customer to list
+        /// <summary>
+        /// Creates a new account holder and appends them to the model: generates the next
+        /// <c>C-2026-NNN</c> id, then builds a <see cref="BankStaff"/> when <paramref name="isStaff"/>
+        /// is set or a <see cref="Customer"/> otherwise, opening the three standard accounts with the
+        /// supplied balances.
+        /// </summary>
+        /// <param name="name">Full name; must not be blank.</param>
+        /// <param name="contactDetails">Free-text contact string (phone / email).</param>
+        /// <param name="isStaff"><c>true</c> to create a Bank Staff holder (eligible for the 50% fee benefit).</param>
+        /// <param name="staffId">Staff id; ignored when not staff, auto-filled when blank.</param>
+        /// <param name="everydayBal">Opening balance of the Everyday account.</param>
+        /// <param name="invRate">Interest rate of the Investment account (e.g. <c>0.05</c>).</param>
+        /// <param name="invBal">Opening balance of the Investment account.</param>
+        /// <param name="omniOverdraft">Overdraft limit of the Omni account.</param>
+        /// <param name="omniBal">Opening balance of the Omni account.</param>
+        /// <returns><c>true</c> when added; <c>false</c> when <paramref name="name"/> is blank.</returns>
         public bool AddCustomer(string name, string contactDetails, bool isStaff, string staffId, decimal everydayBal, decimal invRate, decimal invBal, decimal omniOverdraft, decimal omniBal)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -56,12 +65,13 @@ namespace _20231503_ManishRay_Assignment3.Controllers
                 return false;
             }
 
-            string newId = $"C-2026-{customerList.Count + 1:D3}";
+            var customers = repository.Customers;
+            string newId = $"C-2026-{customers.Count + 1:D3}";
             User newCustomer;
 
             if (isStaff)
             {
-                string sId = string.IsNullOrWhiteSpace(staffId) ? "STF-00" + (customerList.Count + 1) : staffId;
+                string sId = string.IsNullOrWhiteSpace(staffId) ? "STF-00" + (customers.Count + 1) : staffId;
                 newCustomer = new BankStaff(newId, name, contactDetails, sId, everydayBal, invRate, invBal, omniOverdraft, omniBal);
             }
             else
@@ -69,14 +79,21 @@ namespace _20231503_ManishRay_Assignment3.Controllers
                 newCustomer = new Customer(newId, name, contactDetails, everydayBal, invRate, invBal, omniOverdraft, omniBal);
             }
 
-            customerList.Add(newCustomer);
+            customers.Add(newCustomer);
             return true;
         }
 
-        // Update existing customer details
+        /// <summary>
+        /// Updates an existing account holder's name and contact details in place; their accounts
+        /// and customer number are unchanged.
+        /// </summary>
+        /// <param name="customerNumber">Id of the customer to update.</param>
+        /// <param name="newName">Replacement name; must not be blank.</param>
+        /// <param name="newContactDetails">Replacement contact string.</param>
+        /// <returns><c>true</c> on success; <c>false</c> when not found or the new name is blank.</returns>
         public bool UpdateCustomer(string customerNumber, string newName, string newContactDetails)
         {
-            User? cust = GetCustomerByNumber(customerNumber);
+            User? cust = repository.FindByNumber(customerNumber);
             if (cust == null || string.IsNullOrWhiteSpace(newName))
             {
                 return false;
@@ -86,22 +103,28 @@ namespace _20231503_ManishRay_Assignment3.Controllers
             return true;
         }
 
-        // Delete a customer by ID
+        /// <summary>
+        /// Deletes an account holder, but refuses to remove the last remaining customer so the model
+        /// is never left empty.
+        /// </summary>
+        /// <param name="customerNumber">Id of the customer to delete.</param>
+        /// <returns><c>true</c> when removed; <c>false</c> when not found or they are the only customer left.</returns>
         public bool DeleteCustomer(string customerNumber)
         {
-            User? cust = GetCustomerByNumber(customerNumber);
-            if (cust == null || customerList.Count <= 1)
+            User? cust = repository.FindByNumber(customerNumber);
+            if (cust == null || repository.Customers.Count <= 1)
             {
                 return false;
             }
 
-            return customerList.Remove(cust);
+            return repository.Customers.Remove(cust);
         }
 
-        // Returns count of customers
+        /// <summary>Number of account holders currently in the model.</summary>
+        /// <returns>The customer count (always at least 1).</returns>
         public int GetCustomerCount()
         {
-            return customerList.Count;
+            return repository.Customers.Count;
         }
     }
 }

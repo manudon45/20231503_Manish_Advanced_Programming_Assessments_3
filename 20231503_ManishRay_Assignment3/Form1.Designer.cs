@@ -30,6 +30,7 @@ namespace _20231503_ManishRay_Assignment3
             StartPosition = FormStartPosition.CenterScreen;
             Text = "ManishRayy Bank Account Management";
             Load += Form1_Load;
+            FormClosing += Form1_FormClosing;
             ResumeLayout(false);
         }
     }

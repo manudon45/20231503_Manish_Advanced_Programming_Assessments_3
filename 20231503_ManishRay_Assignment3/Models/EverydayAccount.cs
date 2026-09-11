@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using _20231503_ManishRay_Assignment3.Exceptions;
 
 namespace _20231503_ManishRay_Assignment3.Models
@@ -5,6 +6,13 @@ namespace _20231503_ManishRay_Assignment3.Models
     public class EverydayAccount : Account
     {
         public EverydayAccount(decimal initialBalance = 500m) : base("Everyday Account", initialBalance)
+        {
+        }
+
+        // Restore constructor used by System.Text.Json when loading saved state
+        [JsonConstructor]
+        public EverydayAccount(int accountId, string accountName, decimal balance, string lastTransactionStatus)
+            : base(accountId, accountName, balance, lastTransactionStatus)
         {
         }
 
@@ -32,7 +40,7 @@ namespace _20231503_ManishRay_Assignment3.Models
             if (amount > Balance)
             {
                 LastTransactionStatus = $"Withdrawal Failed: Insufficient Funds  |  Balance: {Balance:C2}";
-                string msg = $"Everyday Account withdrawal failed: Requested amount {amount:C2} exceeds current balance {Balance:C2}. Everyday accounts do not support overdrafts.";
+                string msg = $"Everyday Account withdrawal failed - Insufficient Funds. Requested {amount:C2} exceeds the available balance of {Balance:C2}, and Everyday accounts have no overdraft.";
                 throw new InsufficientFundsException(msg, AccountName, Balance, amount);
             }
 

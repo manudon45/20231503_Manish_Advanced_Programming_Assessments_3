@@ -1,0 +1,1 @@
+search_result['108']=["topic_0000000000000044.html","BankController Class","Top-level MVC controller the WinForms layer talks to. Owns the shared BankRepository\r\nand the three segregated sub-controllers, and exposes the whole-system load / save that\r\nForm1 wires to its Load a..."];

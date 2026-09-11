@@ -400,3 +400,13 @@ FodyWeavers.xsd
 *.sln.iml
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp
+
+# .NET artifacts output (Directory.Build.props redirects builds here; normally lives outside the repo)
+.artifacts/
+
+### Application runtime data (Task 5 - JSON persistence store) ###
+# Generated at runtime next to the executable; not source, so it is not tracked.
+bank_data.json
+bank_data.json.tmp
+bank_data.json.corrupt-*
+*.corrupt-*
