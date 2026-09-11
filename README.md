@@ -40,7 +40,7 @@ in the technical report. Both live one level up - see section 5.
 
 ### Open the solution
 
-1. Launch Visual Studio 2022 and choose **Open a project or solution**.
+1. Launch Visual Studio 2026 and choose **Open a project or solution**.
 2. Open **`20231503_ManishRay_Assignment3.slnx`** in the repository root.
 3. Projects loaded:
    - `20231503_ManishRay_Assignment3` - WinForms GUI application.
