@@ -47,10 +47,12 @@ namespace _20231503_ManishRay_Assignment3.Models
 
             if (amount > Balance + OverdraftLimit)
             {
+                decimal availableLimit = Balance + OverdraftLimit;
                 decimal fee = isStaff ? FailedFee * 0.5m : FailedFee;
                 AdjustBalance(-fee);
                 LastTransactionStatus = $"Withdrawal Failed: Exceeds Overdraft Limit  |  Fee Charged: {fee:C2}  |  Balance: {Balance:C2}";
-                string msg = $"Omni Account withdrawal failed: Requested amount {amount:C2} exceeds total limit of {(Balance + fee + OverdraftLimit):C2} (Overdraft: {OverdraftLimit:C2}). Failed fee of {fee:C2} charged.";
+                string msg = $"Omni Account withdrawal failed - Exceeds Overdraft Limit. Requested {amount:C2} exceeds the available limit of {availableLimit:C2} "
+                           + $"(balance {availableLimit - OverdraftLimit:C2} + overdraft {OverdraftLimit:C2}). A failed transaction fee of {fee:C2} was charged.";
                 throw new InsufficientFundsException(msg, AccountName, Balance, amount);
             }
 

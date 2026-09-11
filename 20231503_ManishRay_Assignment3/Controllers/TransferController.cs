@@ -4,19 +4,36 @@ using _20231503_ManishRay_Assignment3.Models;
 
 namespace _20231503_ManishRay_Assignment3.Controllers
 {
-    // Handles intra-account transfers between two accounts owned by the same customer.
+    /// <summary>
+    /// MVC controller for Sprint 3's headline feature: intra-account transfers. Moves money between
+    /// two accounts owned by the same customer (cross-customer transfers are out of scope). All the
+    /// transfer logic lives here, not in the form.
+    /// </summary>
     public class TransferController
     {
         private readonly BankRepository repository;
 
+        /// <summary>Creates the controller over the shared in-memory model + persistence layer.</summary>
+        /// <param name="repository">The shared repository.</param>
         public TransferController(BankRepository repository)
         {
             this.repository = repository;
         }
 
-        // Move funds between two accounts belonging to the same customer. Reuses Account.Withdraw /
-        // Account.Deposit so overdraft limits, balance checks and the staff-discounted failed fee
-        // all apply; a failed withdrawal aborts the transfer before any money reaches the destination.
+        /// <summary>
+        /// Transfers <paramref name="amount"/> between two of a customer's accounts. Validates the
+        /// customer, both account indices, that the two accounts differ and that the amount is
+        /// positive, then calls <c>source.Withdraw</c> followed by <c>destination.Deposit</c> - so the
+        /// balance / overdraft checks and the staff-discounted failed-fee all apply, and a failed
+        /// withdrawal aborts the transfer before any money reaches the destination.
+        /// </summary>
+        /// <param name="customerNumber">Id of the customer who owns both accounts.</param>
+        /// <param name="sourceIndex">Index of the account to take funds from.</param>
+        /// <param name="destinationIndex">Index of the account to move funds into.</param>
+        /// <param name="amount">Positive amount to move.</param>
+        /// <returns>A success message with the amount moved and both resulting balances.</returns>
+        /// <exception cref="BankingException">Validation failure: customer not found, invalid selection, same account, or non-positive amount.</exception>
+        /// <exception cref="InsufficientFundsException">The source account cannot cover the withdrawal; any failed-transfer fee has already been charged to it.</exception>
         public string TransferFunds(string customerNumber, int sourceIndex, int destinationIndex, decimal amount)
         {
             User? customer = repository.FindByNumber(customerNumber);
@@ -33,12 +50,12 @@ namespace _20231503_ManishRay_Assignment3.Controllers
 
             if (sourceIndex == destinationIndex)
             {
-                throw new BankingException("Transfer failed: source and destination must be different accounts.", "Transfer");
+                throw new BankingException("Transfer failed - Source and destination must be different accounts.", "Transfer");
             }
 
             if (amount <= 0)
             {
-                throw new BankingException("Transfer failed: amount must be a positive value.", "Transfer");
+                throw new BankingException("Transfer failed - Amount must be positive.", "Transfer");
             }
 
             Account source = customer.Accounts[sourceIndex];

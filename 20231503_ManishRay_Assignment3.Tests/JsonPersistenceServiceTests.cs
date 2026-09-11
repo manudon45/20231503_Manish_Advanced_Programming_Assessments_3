@@ -154,5 +154,22 @@ namespace _20231503_ManishRay_Assignment3.Tests
             Assert.HasCount(4, katherine.Accounts);
             Assert.AreEqual(123.45m, katherine.Accounts[3].Balance);
         }
+
+        // T1-S11: transferred balances are still correct after "restarting" the application.
+        [TestMethod]
+        public void T1_S11_TransferredBalancesSurviveARestart()
+        {
+            var session1 = new BankController(new JsonPersistenceService(tempFile));
+            session1.Transfers.TransferFunds("C-2026-001", 0, 1, 250m); // Everyday -> Investment
+            session1.SaveData();                                        // FormClosing
+
+            var session2 = new BankController(new JsonPersistenceService(tempFile));
+            Assert.IsTrue(session2.LoadData());                         // Form_Load
+
+            User customer = session2.Customers.GetCustomerByNumber("C-2026-001")!;
+            Assert.AreEqual(250m, customer.Accounts[0].Balance);        // Everyday 500 - 250
+            Assert.AreEqual(1250m, customer.Accounts[1].Balance);       // Investment 1000 + 250
+            Assert.AreEqual(500m, ((OmniAccount)customer.Accounts[2]).OverdraftLimit);
+        }
     }
 }

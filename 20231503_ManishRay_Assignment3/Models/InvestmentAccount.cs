@@ -56,10 +56,12 @@ namespace _20231503_ManishRay_Assignment3.Models
 
             if (amount > Balance)
             {
+                decimal balanceBeforeFee = Balance;
                 decimal fee = isStaff ? FailedFee * 0.5m : FailedFee;
                 AdjustBalance(-fee);
                 LastTransactionStatus = $"Withdrawal Failed: Insufficient Funds  |  Fee Charged: {fee:C2}  |  Balance: {Balance:C2}";
-                string msg = $"Investment Account withdrawal failed: Requested amount {amount:C2} exceeds balance. Failed transaction fee of {fee:C2} was charged.";
+                string msg = $"Investment Account withdrawal failed - Insufficient Funds. Requested {amount:C2} exceeds the balance of {balanceBeforeFee:C2}. "
+                           + $"A failed transaction fee of {fee:C2} was charged.";
                 throw new InsufficientFundsException(msg, AccountName, Balance, amount);
             }
 

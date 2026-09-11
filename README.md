@@ -22,9 +22,9 @@ adds intra-account transfers, a dynamic one-to-many account model, and JSON data
 | 3 | One-to-many account model, dynamic "Add New Account", Bank Staff distinction | Complete |
 | 4 | Form inheritance (`BaseForm`), dedicated intra-account transfer screen, wireframes | Complete |
 | 5 | JSON serialization with polymorphic account types, auto save/load | Complete (`Persistence/`, `Task5-JSON-Persistence-Sequence-Diagram.md`) |
-| 6 | Manual test plan and results table | In progress |
-| 7 | Controller XML documentation + generated report | In progress |
-| 8 | 3-page bank staff user guide | In progress |
+| 6 | Manual test plan and results table | Complete (`Task6-Test-Plan-and-Results.md`; 54 automated tests) |
+| 7 | Controller XML documentation + generated report | Complete (`/// <summary>` on all controllers; `Task7-Controller-Technical-Documentation.html`/`.pdf` via `tools/generate-docs.mjs`) |
+| 8 | 3-page bank staff user guide | Complete (`Task8-User-Guide.html`/`.pdf`, real app screenshots in `img/`) |
 
 ---
 
@@ -221,12 +221,16 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 
 ### Current result
 
-- **Total: 37 - Passed: 37 - Failed: 0**
-- Includes `AddAccountToCustomer` (one-to-many) and `TransferFunds` coverage: valid transfer,
-  same-account rejection, insufficient-funds rollback, and the staff 50% failed-fee discount.
-- Includes `JsonPersistenceServiceTests` (Task 5): polymorphic save/load round-trip, staff role
-  and type-specific fields preserved, domain rules still enforced on restored accounts, corrupt
-  file quarantined, unknown schema rejected, Controller save-then-load round-trip.
+- **Total: 54 - Passed: 54 - Failed: 0**
+- `TransferControllerTests` follows the Task 1 Gherkin one-for-one (T1-SO1 … T1-S11): every
+  successful-transfer example, both overdraft cases, all failure states and boundaries, the
+  same-account / non-positive rejections, customer scoping, and all four staff 50%-fee rows.
+- `JsonPersistenceServiceTests` (Task 5): polymorphic save/load round-trip, staff role and
+  type-specific fields preserved, domain rules still enforced on restored accounts, corrupt file
+  quarantined, unknown schema rejected, `BankController` save-then-load, and T1-S11 (balances
+  survive a restart).
+- `CustomerControllerTests` / `AccountControllerTests`: CRUD, staff creation, last-customer
+  guard, 1:N add/remove, unknown-customer / unknown-type handling.
 
 ---
 
@@ -264,22 +268,19 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 │   ├── TransferForm.cs / .Designer.cs               # Intra-account transfer modal (Task 4)
 │   └── Program.cs
 │
-├── 20231503_ManishRay_Assignment3.Tests/           # MSTest project
+├── 20231503_ManishRay_Assignment3.Tests/           # MSTest project (54 tests)
 │   ├── EverydayAccountTests.cs
 │   ├── InvestmentAccountTests.cs
 │   ├── OmniAccountTests.cs
 │   ├── CustomerControllerTests.cs
 │   ├── AccountControllerTests.cs
-│   ├── TransferControllerTests.cs
+│   ├── TransferControllerTests.cs                   # Task 6 - the Task 1 Gherkin, scenario by scenario
 │   └── JsonPersistenceServiceTests.cs               # Task 5 - JSON round-trip / edge cases
 │
-├── AdvancedProgrammingUMLDiagrams.drawio           # Updated UML class diagram
-├── Gherkin-Scenarios.docx                          # Task 1 BDD scenarios
-├── Task3-Class-Extensions-Report.md                # Task 3 class extensions report
-├── Task4-UI-Wireframes-and-Sitemap.md              # Task 4 wireframes, sitemap, form-inheritance tree
-├── Task5-JSON-Persistence-Sequence-Diagram.md      # Task 5 save/load sequence diagrams + sample JSON
 └── README.md
 ```
+
+Planning / hand-over documents live one level up (submitted to Canvas separately)
 
 ---
 
