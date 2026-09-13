@@ -159,8 +159,7 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 │   ├── TransferControllerTests.cs                   # Task 6 - the Task 1 Gherkin, scenario by scenario
 │   └── JsonPersistenceServiceTests.cs               # Task 5 - JSON round-trip / edge cases
 │
-├── VSdoc/                                           # Task 7 - generated API documentation (VSdocman)
-│   └── index.html                                   # Entry point; one topic page per namespace / type / member
+├── docs/                                           # Task 7 - generated API documentation (DocFX)
 │
 ├── AdvancedProgrammingUMLDiagrams.drawio            # Task 3 - updated UML class diagram (source)
 ├── Directory.Build.props                            # Redirects build output to ../.artifacts
@@ -168,43 +167,9 @@ dotnet test "20231503_ManishRay_Assignment3.Tests/20231503_ManishRay_Assignment3
 ├── .gitignore
 └── README.md
 ```
-
-Planning and hand-over documents live one level up and are submitted to Canvas separately:
-
-| File | Task |
-|------|------|
-| `20231503_Manish_Kumar_Ray_Report.docx` | 3, 4, 5 - UML class diagram, UI wireframes, persistence sequence diagrams |
-| `20231503_Manish_Kumar_Ray_Gherkin_Scenarios.docx` | 1 - Gherkin feature file |
-| `20231503_Manish_Kumar_Ray_Class_Extensions_Report.docx` | 3 - attributes and method signatures |
-| `20231503_Manish_Kumar_Ray_Test_Results.docx` | 6 - test plan, results table, debugging log |
-| `20231503_Manish_Kumar_Ray_User_Guide.docx` | 8 - 3-page bank staff user guide |
-| `Generated references/` | Source material and the generated Task 7 documentation report |
-| `img/`, `sequence diagram/` | Screenshots and exported diagram images used in the documents |
-
 ---
 
 ## 6. Version Control
 
 - Development branch: **`feature/sprint3-integration`** - all Sprint 3 work was committed here, with
   no development on `main`.
-- `.gitignore` excludes `bin/`, `obj/`, `.vs/` and other IDE/build artefacts, plus the runtime data
-  files (`bank_data.json`, `bank_data.json.tmp`, `bank_data.json.corrupt-*`). Builds are
-  additionally redirected out of the repo via `Directory.Build.props` (`UseArtifactsOutput`) - see
-  "Build output location" in section 2.
-- Commit history on the feature branch, oldest first:
-
-  | Commit | Message |
-  |--------|---------|
-  | `da247f3` | feat: Adding new account, updated models and UML |
-  | `fcf67a1` | feat: Updated UML |
-  | `5dcba50` | feat: Transfer feature and UI revamp |
-  | `af87893` | feat: JSON persistence implemented, controllers seggregated |
-  | `1276830` | feat: XML comments added for document generation, test cases updated |
-  | `4780474` | feat: VSdocman used for XML document generation |
-  | `d2da755` | feat: XML documentation generated to html |
-  | `ef5cfb4` | feat: Updated UML |
-
-- **Release:** `feature/sprint3-integration` was merged into `main` through **pull request #1**
-  (merge commit `da60a68`), marking the Sprint 3 release. It is a true merge commit rather than a
-  fast-forward or a squash, so the feature branch and the point where it rejoined `main` both stay
-  visible in `git log --graph --all`.
