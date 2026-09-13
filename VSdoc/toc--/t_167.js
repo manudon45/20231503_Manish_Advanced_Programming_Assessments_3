@@ -1,1 +1,0 @@
-c['167']=[['168',"OmniAccount(int, string, decimal, string, decimal) Constructor","topic_000000000000009D.html",0],['169',"OmniAccount(decimal, decimal) Constructor","topic_000000000000009C.html",0]];

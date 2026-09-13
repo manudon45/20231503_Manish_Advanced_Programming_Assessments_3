@@ -1,1 +1,0 @@
-search_result['104']=["topic_0000000000000040.html","AccountController Constructor","Creates the controller over the shared in-memory model + persistence layer."];

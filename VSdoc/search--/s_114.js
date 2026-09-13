@@ -1,1 +1,0 @@
-search_result['114']=["topic_0000000000000045.html","BankController.Customers Property","Customer CRUD (create, read, update, delete account holders)."];

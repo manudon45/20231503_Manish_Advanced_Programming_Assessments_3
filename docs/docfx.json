@@ -1,0 +1,35 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../20231503_ManishRay_Assignment3",
+          "files": [ "*.csproj" ]
+        }
+      ],
+      "dest": "api",
+      "outputFormat": "mref",
+      "includePrivateMembers": false,
+      "disableGitFeatures": true,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage"
+    }
+  ],
+  "build": {
+    "content": [
+      { "files": [ "api/**.yml", "api/index.md" ] },
+      { "files": [ "index.md", "toc.yml" ] }
+    ],
+    "output": "_site",
+    "template": [ "default", "modern" ],
+    "globalMetadata": {
+      "_appTitle": "Bank Account Management System - Technical Documentation",
+      "_appName": "Bank Account Management System",
+      "_appFooter": "Manish Ray (20231503) - IT7742 Advanced Programming - Assessment 3",
+      "_enableSearch": false,
+      "_disableContribution": true,
+      "_disableNextArticle": true
+    },
+    "disableGitFeatures": true
+  }
+}

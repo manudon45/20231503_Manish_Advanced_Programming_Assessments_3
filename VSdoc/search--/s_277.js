@@ -1,1 +1,0 @@
-search_result['277']=["topic_000000000000009C.html","OmniAccount(Decimal, Decimal) Constructor",""];

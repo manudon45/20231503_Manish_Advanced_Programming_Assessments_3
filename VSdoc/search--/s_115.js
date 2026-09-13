@@ -1,1 +1,0 @@
-search_result['115']=["topic_0000000000000046.html","BankController.Accounts Property","Add, remove and list a customer\u0027s accounts (the one-to-many side)."];

@@ -410,3 +410,7 @@ bank_data.json
 bank_data.json.tmp
 bank_data.json.corrupt-*
 *.corrupt-*
+# DocFX generated output (docs/docfx.json is the source)
+docs/_site/
+docs/api/
+docs/obj/

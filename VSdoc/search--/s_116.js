@@ -1,1 +1,0 @@
-search_result['116']=["topic_0000000000000047.html","BankController.Transfers Property","Intra-account transfers between two accounts owned by the same customer."];

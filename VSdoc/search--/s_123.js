@@ -1,1 +1,0 @@
-search_result['123']=["topic_000000000000004C.html","BankController.SaveData Method","Serializes the entire system state to the JSON file. Called from Form1_FormClosing\r\nso the next session opens where this one ended."];
