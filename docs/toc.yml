@@ -1,0 +1,8 @@
+pdf: true
+pdfFileName: "20231503_Manish_Kumar_Ray_Technical_Documentation.pdf"
+pdfTocPage: true
+items:
+- name: Overview
+  href: index.md
+- name: API Reference
+  href: api/toc.yml
