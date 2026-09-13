@@ -1,1 +1,0 @@
-search_result['156']=["topic_000000000000005D.html","BankRepository(JsonPersistenceService) Constructor","Creates the repository with an explicit persistence service (used by the tests)."];

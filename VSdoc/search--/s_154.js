@@ -1,1 +1,0 @@
-search_result['154']=["topic_000000000000005C.html","BankRepository Constructor","Creates the repository with the default JSON store (a file beside the executable)."];

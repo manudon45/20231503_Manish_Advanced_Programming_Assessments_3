@@ -1,1 +1,0 @@
-search_result['117']=["topic_0000000000000048.html","BankController Constructor","Creates the controller with the default JSON store (a file beside the executable)."];

@@ -1,1 +1,0 @@
-search_result['162']=["topic_0000000000000062.html","BankRepository.FindByNumber Method","Finds an account holder by customer number (trimmed, case-insensitive)."];

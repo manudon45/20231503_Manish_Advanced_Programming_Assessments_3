@@ -1,1 +1,0 @@
-search_result['385']=["topic_00000000000000DD.html","TransferForm.Dispose Method","Disposes of the resources (other than memory) used by the Form."];
